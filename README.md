@@ -11,18 +11,22 @@ $ npm install most-data-mongo
 
 Register MongoDB adapter on app.json as follows:
 
-  "adapterTypes": [
+    "adapterTypes": [
+        ...
         { "name":"MongoDB Data Adapter", "invariantName": "mongo", "type":"most-data-mongo" }
+        ...
     ]
     
-    adapters: {
+    adapters: [
+        ...
         { "name":"mongo-db", "invariantName":"mongo", "default":false,
             "options": {
               "host":"localhost",
               "port":27017,
               "database":"db"
             }
-    }
-}
+        }
+        ...
+    ]
 
 If you are intended to use MongoDB adapter as the default database adapter set the property "default" to true. 
