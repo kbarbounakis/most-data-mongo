@@ -1,0 +1,30 @@
+{
+  "name": "most-data-mongo",
+  "version": "1.0.1",
+  "description": "MOST Web Framework MongoDB Adapter",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kbarbounakis/most-data-mongo.git"
+  },
+  "keywords": [
+    "most",
+    "web",
+    "data",
+    "db",
+    "adapter",
+    "mongodb",
+    "mongo",
+    "nosql"
+  ],
+  "author": "Kyriakos Barbounakis <k.barbounakis@gmail.com>",
+  "license": "BSD3-Clause",
+  "bugs": {
+    "url": "https://github.com/kbarbounakis/most-data-mongo/issues"
+  },
+  "homepage": "https://github.com/kbarbounakis/most-data-mongo",
+  "dependencies": {
+    "mongodb": "^2.0.35",
+    "most-query": "~0.1.8"
+  }
+}

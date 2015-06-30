@@ -29,4 +29,6 @@ Register MongoDB adapter on app.json as follows:
         ...
     ]
 
-If you are intended to use MongoDB adapter as the default database adapter set the property "default" to true. 
+If you are intended to use MongoDB adapter as the default database adapter set the property "default" to true.
+
+Most Web Framework MongoDB Adapter is under development.
