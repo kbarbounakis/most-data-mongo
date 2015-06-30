@@ -1,5 +1,5 @@
-most-data-pg
-===========
+most-data-mongo
+===============
 
 Most Web Framework MongoDB Adapter
 
