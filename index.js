@@ -163,7 +163,8 @@ function executeInsert_(query) {
             var db = self.rawConnection;
             return db.collection(entity, { strict:true }, function(err, collection) {
                 if (err) { return deferred.reject(err); }
-                var obj = query.$insert[entity];
+                var formatter = new MongoFormatter(collection);
+                var obj = formatter.formatInsert(query);
                 if (_.isArray(obj)) {
                     return collection.insertMany(obj, function(err, result) {
                         if (err) { return deferred.reject(err); }
@@ -211,7 +212,9 @@ function executeDelete_(query) {
             var db = self.rawConnection;
             return db.collection(entity, { strict:true }, function(err, collection) {
                 if (err) { return deferred.reject(err); }
-                return collection.removeMany(query.$where, function(err, result) {
+                var formatter = new MongoFormatter(collection);
+                var where = formatter.formatDelete(query);
+                return collection.removeMany(where, function(err, result) {
                     if (err) { return deferred.reject(err); }
                     return deferred.resolve(result);
                 });
@@ -247,9 +250,10 @@ function executeUpdate_(query) {
             var db = self.rawConnection;
             return db.collection(entity, { strict:true }, function(err, collection) {
                 if (err) { return deferred.reject(err); }
-                var obj = query.$update[entity];
+                var formatter = new MongoFormatter(collection);
+                var obj = formatter.formatUpdate(query);
                 if (_.isObject(obj)) {
-                    return collection.updateMany(query.$where, obj, function(err, result) {
+                    return collection.updateMany(formatter.formatWhere(query.$where), obj, function(err, result) {
                         if (err) { return deferred.reject(err); }
                         return deferred.resolve(result);
                     });
@@ -287,19 +291,11 @@ function executeSelect_(query) {
              */
             var db = self.rawConnection;
             return db.collection(entity, { strict:true }, function(err, collection) {
-                if (err) { return deferred.reject(err); }
-                var obj = query.$select[entity];
-                if (_.isObject(obj)) {
-                    return collection.find(query.$where, obj, function(err, result) {
-                        if (err) { return deferred.reject(err); }
-                        return deferred.resolve(result);
-                    });
-                }
-                else {
-                    return deferred.reject(new Error('Invalid update object. Expected an object or an array of objects'));
-                }
-
-
+                var formatter = new MongoFormatter(collection);
+                return formatter.formatLimitSelect(query).toArray(function(err, result) {
+                    if (err) { return deferred.reject(err); }
+                    return deferred.resolve(result);
+                });
             });
         });
 
@@ -330,19 +326,197 @@ MongoAdapter.prototype.close = function(callback) {
         return callback();
     }
 
+};
 
+/**
+ *
+ * @param obj {*} An Object that represents the data model scheme we want to migrate
+ * @param callback {Function}
+ */
+MongoAdapter.prototype.migrate = function(obj, callback) {
+    var self = this;
+    self.open(function(err) {
+        if (err) { return callback(err); }
+        var db = self.rawConnection;
+        var counter = obj.add.find(function(x) { return x.type === 'Counter'; });
+        if (counter) {
+            //add default counter if any
+            self.rawConnection.collection('counters', function(err, counters) {
+                if (err) { return callback(err); }
+                self.counters = self.counters || [];
+                if (typeof self.counters.find(function(x) { return (x.entity === obj.appliesTo) && (x.attribute === counter.name); }) === 'undefined') {
+                    self.counters.push({ entity:obj.appliesTo , attribute:counter.name });
+                }
+                return callback(null, true);
+            });
+        }
+        else {
+            callback(null, true);
+        }
+    });
+};
+
+/**
+ *
+ * @param {string} name
+ * @param {QueryExpression|*} query
+ * @param {Function} callback
+ * @returns {*}
+ */
+MongoAdapter.prototype.createView = function(name, query, callback) {
+    callback = callback || function() { };
+    //do nothing
+   return callback();
+};
+
+/**
+ * Produces a new identity value for the given entity and attribute.
+ * @param entity {String} The target entity name
+ * @param attribute {String} The target attribute
+ * @param callback {Function=}
+ */
+MongoAdapter.prototype.selectIdentity = function(entity, attribute , callback) {
+    var self = this;
+    self.open(function(err) {
+        if (err) { return callback(err); }
+        self.rawConnection.collection('counters', null, function(err, counters) {
+            if (err) { return callback(err); }
+            var doc = { entity: entity, attribute: attribute };
+            counters.findOneAndUpdate( doc, { $inc: { seq: 1 } }, { returnOriginal: false, upsert:true }, function(err, result) {
+                if (err) { return callback(err); }
+                callback(null, result.value.seq);
+            });
+        });
+    });
+};
+
+/**
+ * @class
+ * @constructor
+ * @param {Collection} collection
+ * @augments SqlFormatter
+ */
+function MongoFormatter(collection) {
+    if (_.isNil(collection)) {
+        throw new Error('Invalid Argument. Expected a valid collection object');
+    }
+    if (!_.isFunction(collection.find)) {
+        throw new Error('Invalid Argument. Expected a valid collection object');
+    }
+    this.getCollection = function() {
+        return collection;
+    }
+}
+util.inherits(MongoFormatter, qry.classes.SqlFormatter);
+
+/**
+ * @param {QueryExpression|*} q
+ * @returns {Cursor|*}
+ */
+MongoFormatter.prototype.formatSelect = function(q) {
+    /**
+     * @type Array|*
+     */
+    var select = q.$select[this.getCollection().s.name] || ['*'];
+    if (!_.isArray(select)) {
+        throw new Error('Invalid Argument. Select must be an array of attributes');
+    }
+    var projection = { };
+    if (select.indexOf("*")<0) {
+        _.forEach(select, function(x) {
+            projection[x] = 1;
+        });
+    }
+    return this.getCollection().find(this.formatWhere(q.$where), projection).sort(this.formatOrder(q.$order));
+};
+
+/**
+ * @param {QueryExpression|*} q
+ * @returns {*}
+ */
+MongoFormatter.prototype.formatInsert = function(q) {
+    var insert = q.$insert[this.getCollection().s.name];
+    if (_.isEmpty(insert)) {
+        throw new Error('Invalid Argument. Expected object or array');
+    }
+    return insert;
+};
+
+/**
+ * @param {QueryExpression|*} q
+ * @returns {*}
+ */
+MongoFormatter.prototype.formatUpdate = function(q) {
+    var update = q.$update[this.getCollection().s.name];
+    if (_.isEmpty(update)) {
+        throw new Error('Invalid Argument. Expected object or array');
+    }
+    return update;
+};
+
+/**
+ * @param {QueryExpression|*} q
+ * @returns {*}
+ */
+MongoFormatter.prototype.formatDelete = function(q) {
+    var remove = q.$where;
+    if (_.isEmpty(remove)) {
+        throw new Error('Invalid Argument. Expected expression');
+    }
+    return remove;
+};
+
+/**
+ * @param {*} where
+ * @returns {Cursor|*}
+ */
+MongoFormatter.prototype.formatWhere = function(where) {
+    return where;
+};
+
+/**
+ * Formats a order object to the equivalent SQL statement
+ * @param {*} order
+ * @returns {*}
+ */
+MongoFormatter.prototype.formatOrder = function(order)
+{
+    var self = this, result = { };
+    if (!util.isArray(order))
+        return result;
+    _.forEach(order, function(x) {
+        var f = _.isEmpty(x.$desc) ? x.$asc : x.$desc, flag = _.isEmpty(x.$desc) ? 1 : -1;
+        if (_.isArray(f)) {
+            _.forEach(f, function(y) {
+                result[y] = flag;
+            });
+        }
+        else {
+            result[f] = flag;
+        }
+    });
+
+    return result;
 
 };
 
 /**
- * @class MongoFormatter
- * @constructor
- * @augments SqlFormatter
+ * @param {QueryExpression|*} q
+ * @returns {Cursor|*}
  */
-function MongoFormatter() {
-
-}
-util.inherits(MongoFormatter, qry.classes.SqlFormatter);
+MongoFormatter.prototype.formatLimitSelect = function(q) {
+    var cursor = this.formatSelect(q);
+    var skip = 0;
+    if (_.isNumber(q.$skip) && parseInt(q.$skip)>0)
+        skip = parseInt(q.$skip);
+    var take = 25;
+    if (_.isNumber(q.$take) && parseInt(q.$take)<0)
+        //do select without paging
+        return cursor;
+    if (_.isNumber(q.$take) && parseInt(q.$take)>0)
+        take = parseInt(q.$take);
+    return cursor.skip(skip).limit(take);
+};
 
 var mongoadp = { };
 

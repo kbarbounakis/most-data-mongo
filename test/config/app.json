@@ -1,0 +1,41 @@
+{
+    "adapterTypes": [
+        {
+            "name": "MongoDB Data Adapter",
+            "invariantName": "mongo",
+            "type": "most-data-mongo"
+        }
+    ],
+    "adapters": [
+        {
+            "name": "test",
+            "invariantName": "mongo",
+            "default": false,
+            "options": {
+                "host":"localhost",
+                "port":10250,
+                "user":"user",
+                "database":"dev",
+                "password":"password",
+                "options": {
+                    "ssl": false
+                }
+            }
+        },
+        {
+            "name": "invalid",
+            "invariantName": "mongo",
+            "default": false,
+            "options": {
+                "host":"localhost",
+                "port":10250,
+                "user":"user",
+                "database":"dev",
+                "password":"wrongPassword",
+                "options": {
+                    "ssl": false
+                }
+            }
+        }
+    ]
+}

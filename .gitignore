@@ -1,3 +1,4 @@
 .idea
 node_modules
-tests
+./test/config/app.test.json
+.DS_Store
