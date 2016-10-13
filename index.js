@@ -125,6 +125,20 @@ MongoAdapter.prototype.execute = function(query, values, callback) {
             return callback(err);
         });
     }
+    else if (query.hasOwnProperty('$update')) {
+        return executeUpdate_.call(this, query).then(function(result) {
+            return callback(null, result);
+        }).catch(function(err) {
+            return callback(err);
+        });
+    }
+    else if (query.hasOwnProperty('$select')) {
+        return executeSelect_.call(this, query).then(function(result) {
+            return callback(null, result);
+        }).catch(function(err) {
+            return callback(err);
+        });
+    }
     return callback(new Error('Not yet implemented'));
 };
 /**
@@ -201,6 +215,91 @@ function executeDelete_(query) {
                     if (err) { return deferred.reject(err); }
                     return deferred.resolve(result);
                 });
+            });
+        });
+
+    });
+    return deferred.promise;
+}
+
+/**
+ * @param {{$update:*,$where:*}|*} query
+ * @returns {*|promise}
+ * @private
+ */
+function executeUpdate_(query) {
+    var deferred = Q.defer();
+    var self = this;
+    process.nextTick(function() {
+        //get first property of $update
+        var entity = Object.keys(query.$update)[0];
+        if (_.isNil(entity)) {
+            return deferred.reject('Invalid update expression. Entity may not be null');
+        }
+        if (_.isNil(query.$where)) {
+            return deferred.reject('Invalid update expression. Query may not be null');
+        }
+        self.open(function(err) {
+            if (err) { return deferred.reject(err); }
+            /**
+             * @type {Db|*}
+             */
+            var db = self.rawConnection;
+            return db.collection(entity, { strict:true }, function(err, collection) {
+                if (err) { return deferred.reject(err); }
+                var obj = query.$update[entity];
+                if (_.isObject(obj)) {
+                    return collection.updateMany(query.$where, obj, function(err, result) {
+                        if (err) { return deferred.reject(err); }
+                        return deferred.resolve(result);
+                    });
+                }
+                else {
+                    return deferred.reject(new Error('Invalid update object. Expected an object or an array of objects'));
+                }
+
+
+            });
+        });
+
+    });
+    return deferred.promise;
+}
+
+/**
+ * @param {{$select:*,$where:*}|*} query
+ * @returns {*|promise}
+ * @private
+ */
+function executeSelect_(query) {
+    var deferred = Q.defer();
+    var self = this;
+    process.nextTick(function() {
+        //get first property of $update
+        var entity = Object.keys(query.$select)[0];
+        if (_.isNil(entity)) {
+            return deferred.reject('Invalid select expression. Entity may not be null');
+        }
+        self.open(function(err) {
+            if (err) { return deferred.reject(err); }
+            /**
+             * @type {Db|*}
+             */
+            var db = self.rawConnection;
+            return db.collection(entity, { strict:true }, function(err, collection) {
+                if (err) { return deferred.reject(err); }
+                var obj = query.$select[entity];
+                if (_.isObject(obj)) {
+                    return collection.find(query.$where, obj, function(err, result) {
+                        if (err) { return deferred.reject(err); }
+                        return deferred.resolve(result);
+                    });
+                }
+                else {
+                    return deferred.reject(new Error('Invalid update object. Expected an object or an array of objects'));
+                }
+
+
             });
         });
 
