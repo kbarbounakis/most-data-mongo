@@ -132,7 +132,7 @@ MongoAdapter.prototype.execute = function(query, values, callback) {
             return callback(err);
         });
     }
-    else if (query.hasOwnProperty('$select')) {
+    else if (query.hasOwnProperty('$select') || query.hasOwnProperty('$projection')) {
         return executeSelect_.call(this, query).then(function(result) {
             return callback(null, result);
         }).catch(function(err) {
@@ -161,7 +161,7 @@ function executeInsert_(query) {
              * @type {Db|*}
              */
             var db = self.rawConnection;
-            return db.collection(entity, { strict:true }, function(err, collection) {
+            return db.collection(entity, { strict:false }, function(err, collection) {
                 if (err) { return deferred.reject(err); }
                 var formatter = new MongoFormatter(collection);
                 var obj = formatter.formatInsert(query);
@@ -421,13 +421,29 @@ MongoFormatter.prototype.formatSelect = function(q) {
     if (!_.isArray(select)) {
         throw new Error('Invalid Argument. Select must be an array of attributes');
     }
-    var projection = { };
+    var projection = { }, isAggregated = false;
     if (select.indexOf("*")<0) {
         _.forEach(select, function(x) {
-            projection[x] = 1;
+            if (_.isString(x)) {
+                projection[x] = 1;
+            }
+            else {
+                var alias = Object.keys(x)[0];
+                projection[alias] = x[alias];
+                isAggregated = true;
+            }
         });
     }
-    return this.getCollection().find(this.formatWhere(q.$where), projection).sort(this.formatOrder(q.$order));
+    if (isAggregated) {
+        var pipeline = [
+            { "$project" : projection },
+            {  "$match" : this.formatWhere(q.$where) }
+        ];
+        return this.getCollection().aggregate(pipeline).sort(this.formatOrder(q.$order));
+    }
+    else {
+        return this.getCollection().find(this.formatWhere(q.$where), projection).sort(this.formatOrder(q.$order));
+    }
 };
 
 /**
