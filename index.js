@@ -59,7 +59,7 @@ const SqlFormatter = require('@themost/query').SqlFormatter;
  */
 function executeInsert(query) {
     const self = this;
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         //get first property of $insert
         const entity = Object.keys(query.$insert)[0];
         if (entity == null) {
@@ -111,7 +111,7 @@ function executeInsert(query) {
  */
 function executeDelete(query) {
     const self = this;
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         //get first property of $delete
         const entity = query.$delete;
         if (entity == null) {
@@ -152,7 +152,7 @@ function executeDelete(query) {
  */
 function executeUpdate(query) {
     const self = this;
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         //get first property of $update
         const entity = Object.keys(query.$update)[0];
         if (entity == null) {
@@ -201,7 +201,7 @@ function executeUpdate(query) {
  */
 function executeSelect(query) {
     const self = this;
-    return new Promise(function (resolve, reject) {
+    return new Promise( (resolve, reject) => {
         //get first property of $update
         const entity = Object.keys(query.$select)[0];
         if (entity == null) {
@@ -251,9 +251,10 @@ class MongoAdapter {
         // finalize connection url
         connectionURL_ += '/' + (options.authenticationDatabase ? options.authenticationDatabase : options.database);
 
-        // set db option
-        Object.defineProperty(options.options, 'db', {
-            value: options.database
+        options.options = options.options || {};
+        Object.assign(options.options, {
+            "useNewUrlParser": true,
+            "db": options.database
         });
 
         Object.defineProperty(this, 'connectionURL', {
@@ -422,7 +423,7 @@ class MongoAdapter {
                 return callback(err);
             });
         } else if (query.hasOwnProperty('$select') || query.hasOwnProperty('$projection')) {
-            return executeSelect.call(this, query).then(function (result) {
+            return executeSelect.bind(this)(query).then(function (result) {
                 return callback(null, result);
             }).catch(function (err) {
                 return callback(err);
@@ -475,7 +476,7 @@ class MongoFormatter extends SqlFormatter {
             ];
             return this.getCollection().aggregate(pipeline).sort(this.formatOrder(query.$order));
         } else {
-            return this.getCollection().find(this.formatWhere(query.$where), projection).sort(this.formatOrder(query.$order));
+            return this.getCollection().find(this.formatWhere(query.$where)).project(projection).sort(this.formatOrder(query.$order));
         }
     }
 
@@ -540,6 +541,10 @@ class MongoFormatter extends SqlFormatter {
         if ((typeof query.$take === 'number') && parseInt(query.$take) > 0)
             take = parseInt(query.$take);
         return cursor.skip(skip).limit(take);
+    }
+
+    formatField(obj) {
+
     }
 
 }

@@ -9,6 +9,9 @@ const conf = require('./../config/app.test.json');
 const randoms = require('./randoms');
 const QueryUtils = require('@themost/query').QueryUtils;
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const LangUtils = require('@themost/common').LangUtils;
 
 describe('mongo connection tests', function() {
 
@@ -27,7 +30,13 @@ describe('mongo connection tests', function() {
 
     it('should insert persons', function(done) {
 
-        const newItems = require('./person-seed.json');
+        let str = fs.readFileSync(path.resolve(__dirname, './person-seed.json'), 'utf-8');
+        const newItems = JSON.parse(str, (key, value) => {
+            if (LangUtils.isDate(value)) {
+                return new Date(value);
+            }
+            return value;
+        });
         const q = QueryUtils.insert(newItems).into('things');
         const db = new MongoAdapter(options);
         db.open(function(err) {
@@ -44,7 +53,13 @@ describe('mongo connection tests', function() {
 
     it('should insert products', function(done) {
 
-        const newItems = require('./product-seed.json');
+        let str = fs.readFileSync(path.resolve(__dirname, './product-seed.json'), 'utf-8');
+        const newItems = JSON.parse(str, (key, value) => {
+            if (LangUtils.isDate(value)) {
+                return new Date(value);
+            }
+            return value;
+        });
         const q = QueryUtils.insert(newItems).into('things');
         const db = new MongoAdapter(options);
         db.open(function(err) {
