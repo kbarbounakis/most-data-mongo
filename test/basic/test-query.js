@@ -1,86 +1,96 @@
 /**
  * Created by kbarbounakis on 12/10/2016.
  */
-
-var MongoAdapter = require('./../../index').MongoAdapter,
-    MongoFormatter = require('./../../index').MongoFormatter,
-    /**
-     * IMPORTANT NOTE: Create a copy of app.json as app.test.json and use it to set adapters for MongoDB databases
-     */
-     conf = require('./../config/app.test.json'),
-    qry = require('most-query'),
-    assert = require('assert');
+const MongoAdapter = require('./../../index').MongoAdapter;
+/**
+ * IMPORTANT NOTE: Create a copy of app.json as app.test.json and use it to set adapters for MongoDB databases
+ */
+const conf = require('./../config/app.test.json');
+const QueryUtils = require('@themost/query').QueryUtils;
+const assert = require('assert');
 
 describe('mongo connection tests', function() {
 
-    var options = conf.adapters[0].options;
+    let options = conf.adapters[0].options;
     it('should serialize an insert query expression', function(done) {
-        var q = qry.insert({
+        let query = QueryUtils.insert({
             "name":"anonymous",
             "description":"Anonymous User",
             "additionalType":"User",
             "dateCreated": new Date(),
             "dateModified": new Date()
         }).into('things');
-        console.log(JSON.stringify(q, null, 4));
-        assert.equal(q['$insert']['things'].name,'anonymous');
+        console.log(JSON.stringify(query, null, 4));
+        assert.strictEqual(query['$insert']['things'].name,'anonymous');
         return done();
     });
 
     it('should serialize a delete query expression', function(done) {
-        var q = qry.deleteFrom('things')
+        let query = QueryUtils.delete('things')
             .where('name').equal('anonymous').and('additionalType').equal('User');
-        console.log(JSON.stringify(q, null, 4));
+        console.log(JSON.stringify(query, null, 4));
         return done();
     });
 
     it('should serialize a select query expression', function(done) {
-        var q = qry.selectFrom('things')
+        let query = QueryUtils
             .select(['name','description','additionalType'])
+            .from('things')
             .where('name').equal('anonymous').and('additionalType').equal('User');
-        console.log(JSON.stringify(q, null, 4));
+        console.log(JSON.stringify(query, null, 4));
         return done();
     });
 
 
     it('should serialize an update query expression', function(done) {
-        var q = qry.update('things').set(
+        let query = QueryUtils.update('things').set(
         {
             "description":"Anonymous Site User",
             "dateModified": new Date()
         }).where('name').equal('anonymous').and('additionalType').equal('User');
-        console.log(JSON.stringify(q, null, 4));
+        console.log(JSON.stringify(query, null, 4));
         return done();
     });
 
     it('should insert an object', function(done) {
-        var q = qry.insert({
+        let query = QueryUtils.insert({
             "name":"anonymous",
             "description":"Anonymous User",
             "additionalType":"User",
             "dateCreated": new Date(),
             "dateModified": new Date()
         }).into('things');
-        var db = new MongoAdapter(options);
+        let db = new MongoAdapter(options);
         db.open(function(err) {
             if (err) { return done(err); }
-            db.execute(q, null, function(err, result) {
+            db.execute(query, null, function(err, result) {
                 if (err) { return done(err); }
                 assert.ok(result);
-                console.log(JSON.stringify(result, null, 4));
-                return done();
+                // get data
+                db.execute(
+                    QueryUtils.select(['name'])
+                        .from('things')
+                        .where('name')
+                        .equal('anonymous'), null, function(err, result) {
+                    if (err) {
+                        return done(err);
+                    }
+                    assert.ok(result);
+                    return done();
+                });
+
             });
         });
     });
 
     it('should update an object', function(done) {
-        var q = qry.update('things').set(
+        let q = QueryUtils.update('things').set(
             {
                 "description":"Anonymous Site User",
                 "dateModified": new Date()
             }).where('name').equal('anonymous').and('additionalType').equal('User');
 
-        var db = new MongoAdapter(options);
+        let db = new MongoAdapter(options);
         db.open(function(err) {
             if (err) { return done(err); }
             db.execute(q, null, function(err, result) {
@@ -93,9 +103,9 @@ describe('mongo connection tests', function() {
     });
 
     it('should delete an object', function(done) {
-        var q = qry.deleteFrom('things')
+        let q = QueryUtils.delete('things')
             .where('name').equal('anonymous').and('additionalType').equal('User');
-        var db = new MongoAdapter(options);
+        let db = new MongoAdapter(options);
         db.open(function(err) {
             if (err) { return done(err); }
             db.execute(q, null, function(err, result) {

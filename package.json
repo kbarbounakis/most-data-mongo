@@ -1,6 +1,6 @@
 {
-  "name": "most-data-mongo",
-  "version": "1.0.1",
+  "name": "@themost/mongo",
+  "version": "2.1.0-dev.1",
   "description": "MOST Web Framework MongoDB Data Adapter",
   "main": "index.js",
   "repository": {
@@ -23,13 +23,24 @@
     "url": "https://github.com/kbarbounakis/most-data-mongo/issues"
   },
   "homepage": "https://github.com/kbarbounakis/most-data-mongo",
+  "peerDependencies": {
+    "@themost/common": "^2.3.2",
+    "@themost/query": "^2.3.2"
+  },
+  "engines": {
+    "node": ">=6.9.0"
+  },
   "dependencies": {
+    "@themost/common": "^2.3.2",
+    "@themost/query": "^2.3.2",
     "lodash": "^4.16.4",
-    "mongodb": "^2.0.35",
-    "most-query": "^0.1.32",
+    "mongodb": "^3.2.7",
     "q": "^1.4.1"
   },
   "devDependencies": {
-    "assert": "^1.4.1"
+    "@types/mocha": "^5.2.7",
+    "@types/mongodb": "^3.1.28",
+    "assert": "^1.4.1",
+    "mocha": "^6.1.4"
   }
 }
