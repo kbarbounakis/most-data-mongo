@@ -6,7 +6,7 @@
  * Use of this source code is governed by an BSD-3-Clause license that can be
  * found in the LICENSE file at https://themost.io/license
  */
-//
+const QueryField = require("@themost/query").QueryField;
 const MongoClient = require('mongodb').MongoClient;
 const SqlFormatter = require('@themost/query').SqlFormatter;
 
@@ -436,19 +436,37 @@ class MongoAdapter {
 
 class MongoFormatter extends SqlFormatter {
     /**
-     * @param {Collection} collection
+     * @param {Collection=} collection
      */
     constructor(collection) {
         super();
-        if (collection == null) {
-            throw new Error('Invalid Argument. Expected a valid collection object');
-        }
-        if (typeof collection.find !== 'function') {
-            throw new Error('Invalid Argument. Expected a valid collection object');
-        }
         this.getCollection = function () {
             return collection;
         }
+    }
+
+    formatFieldEx(obj, format) {
+        let result = { };
+        if (obj instanceof QueryField) {
+            if (obj.hasOwnProperty('$name')) {
+                // define field for projection e.g. { "field1" : 1 }
+                Object.defineProperty(result, obj.$name, {
+                   value: 1
+                });
+                return result;
+            }
+            // get property name
+            const property = Object.keys(obj)[0];
+            if (property) {
+                // define field with alias e.g. { "field" : "$field1" }
+                Object.defineProperty(result, property, {
+                    value: '$'.concat(obj[property])
+                });
+                return result;
+            }
+            throw new Error('Not yet implemented');
+        }
+        throw new TypeError('Expected an instance of QueryField');
     }
 
     formatSelect(query) {
