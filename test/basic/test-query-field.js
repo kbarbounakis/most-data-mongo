@@ -1,5 +1,5 @@
-const MongoFormatter = require('./../../index').MongoFormatter;
-const MongoAdapter = require('./../../index').MongoAdapter;
+const MongoFormatter = require('../../modules/mongo').MongoFormatter;
+const MongoAdapter = require('../../modules/mongo').MongoAdapter;
 const QueryField = require('@themost/query').QueryField;
 const assert = require('chai').assert;
 
@@ -26,9 +26,22 @@ describe('test query field format', function () {
 
     it('should format QueryField with max', () => {
         const formatter = new MongoFormatter();
-        const result = formatter.format(new QueryField().max('field1').as('field'), '%f');
+        const result = formatter.formatFieldEx(new QueryField().max('field1').as('field'), '%f');
+        // expected { "field": { "$max": "field1" } }
         assert.isObject(result);
         assert.property(result, 'field');
-        assert.equal(result.field, '$field1');
+        assert.property(result.field, '$max');
+        assert.equal(result.field.$max, '$field1');
     });
+
+    it('should format QueryField with min', () => {
+        const formatter = new MongoFormatter();
+        const result = formatter.formatFieldEx(new QueryField().min('field1').as('field'), '%f');
+        // expected { "field": { "$max": "field1" } }
+        assert.isObject(result);
+        assert.property(result, 'field');
+        assert.property(result.field, '$min');
+        assert.equal(result.field.$min, '$field1');
+    });
+
 });

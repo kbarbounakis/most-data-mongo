@@ -1,4 +1,4 @@
-const MongoAdapter = require('./../../index').MongoAdapter;
+const MongoAdapter = require('../../modules/mongo').MongoAdapter;
 /**
  * IMPORTANT NOTE: Create a copy of app.json as app.test.json and use it to set adapters for MongoDB databases
  */
@@ -237,6 +237,26 @@ describe('test mongoDB query expression', function() {
             .and('releaseDateYear').equal(2014)
             .orderBy('name')
             .take(5);
+        console.log('INFO', 'QUERY', JSON.stringify(query, null, 4));
+        db.execute(query, null, (err, result) => {
+            if (err) {
+                return done(err);
+            }
+            assert.isArray(result);
+            assert.isAtLeast(result.length, 1);
+            console.log('INFO', 'QUERY', JSON.stringify(result, null, 4));
+            result.forEach( item => {
+                assert.equal(item.additionalType, 'Product');
+            });
+            return done();
+        });
+    });
+
+    it('should QueryExpression.select(max(attribute))', (done) => {
+
+        let query = QueryUtils.query('things').select(
+            new QueryField().max('price')).as('maxPrice')
+            .where('additionalType').equal('Product');
         console.log('INFO', 'QUERY', JSON.stringify(query, null, 4));
         db.execute(query, null, (err, result) => {
             if (err) {

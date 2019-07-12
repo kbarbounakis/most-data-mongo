@@ -446,8 +446,8 @@ class MongoFormatter extends SqlFormatter {
     }
 
     formatFieldEx(obj, format) {
-        let result = { };
-        if (obj instanceof QueryField) {
+        if (typeof obj === 'object') {
+            let result = { };
             if (obj.hasOwnProperty('$name')) {
                 // define field for projection e.g. { "field1" : 1 }
                 Object.defineProperty(result, obj.$name, {
@@ -459,10 +459,20 @@ class MongoFormatter extends SqlFormatter {
             const property = Object.keys(obj)[0];
             if (property) {
                 // define field with alias e.g. { "field" : "$field1" }
-                Object.defineProperty(result, property, {
-                    value: '$'.concat(obj[property])
-                });
-                return result;
+                if (typeof obj[property] === 'string') {
+                    Object.defineProperty(result, property, {
+                        value: '$'.concat(obj[property])
+                    });
+                    return result;
+                }
+                if (typeof obj[property] === 'object') {
+                    // get property object e.g. { $max: "price" }
+                    const propertyValue = obj[property];
+                    Object.defineProperty(result, property, {
+                        value: this.formatFieldEx(propertyValue, format)
+                    });
+                    return result;
+                }
             }
             throw new Error('Not yet implemented');
         }
@@ -470,6 +480,7 @@ class MongoFormatter extends SqlFormatter {
     }
 
     formatSelect(query) {
+        const self = this;
         const select = query.$select[this.getCollection().s.name] || ['*'];
         if (!Array.isArray(select)) {
             throw new Error('Invalid Argument. Select must be an array of attributes');
@@ -478,13 +489,8 @@ class MongoFormatter extends SqlFormatter {
         let isAggregated = false;
         if (select.indexOf("*") < 0) {
             select.forEach(function (x) {
-                if (typeof x === 'string') {
-                    projection[x] = 1;
-                } else {
-                    const alias = Object.keys(x)[0];
-                    projection[alias] = x[alias];
-                    isAggregated = true;
-                }
+                const attr = self.format(x, '%f');
+                Object.assign(projection, attr);
             });
         }
         if (isAggregated) {

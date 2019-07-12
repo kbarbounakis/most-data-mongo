@@ -1,7 +1,7 @@
 /**
  * Created by kbarbounakis on 12/10/2016.
  */
-const MongoAdapter = require('./../../index').MongoAdapter;
+const MongoAdapter = require('../../modules/mongo').MongoAdapter;
 /**
  * Important Note: Use ./../config/app.json to set adapters for MongoDB
  */
