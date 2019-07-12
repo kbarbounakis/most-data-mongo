@@ -229,13 +229,10 @@ describe('test mongoDB query expression', function() {
 
         let query = QueryUtils.query('things').select(
             'name',
-            {
-                releaseDateYear: { $year: "$releaseDate" }
-            },
+            QueryField.year('releaseDate').as('releaseDateYear'),
             'additionalType')
             .where('additionalType').equal('Product')
-            .and('releaseDateYear').equal(2014)
-            .orderBy('name')
+            .where('releaseDateYear').equal(2014)
             .take(5);
         console.log('INFO', 'QUERY', JSON.stringify(query, null, 4));
         db.execute(query, null, (err, result) => {
@@ -247,6 +244,7 @@ describe('test mongoDB query expression', function() {
             console.log('INFO', 'QUERY', JSON.stringify(result, null, 4));
             result.forEach( item => {
                 assert.equal(item.additionalType, 'Product');
+                assert.equal(item.releaseDateYear, 2014);
             });
             return done();
         });

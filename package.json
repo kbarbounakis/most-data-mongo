@@ -27,7 +27,9 @@
   "engines": {
     "node": ">=6.9.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@themost/data": "^2.4.5"
+  },
   "devDependencies": {
     "@babel/core": "^7.5.4",
     "@babel/register": "^7.4.4",

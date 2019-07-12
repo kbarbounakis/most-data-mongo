@@ -36,12 +36,18 @@ describe('test query field format', function () {
 
     it('should format QueryField with min', () => {
         const formatter = new MongoFormatter();
-        const result = formatter.formatFieldEx(new QueryField().min('field1').as('field'), '%f');
-        // expected { "field": { "$max": "field1" } }
+        const result = formatter.formatFieldEx(new QueryField().min('price').as('minPrice'), '%f');
+        // expected { "field": { "$min": "field1" } }
         assert.isObject(result);
-        assert.property(result, 'field');
-        assert.property(result.field, '$min');
-        assert.equal(result.field.$min, '$field1');
+        assert.property(result, 'price');
+        assert.property(result['price'], '$min');
+        assert.equal(result['price'].$min, '$minPrice');
+    });
+
+    it('should format QueryField with function', () => {
+        const formatter = new MongoFormatter();
+        const result = formatter.formatFieldEx(new QueryField('year(releaseDate)').as('releaseDateYear'), '%f');
+        assert.isObject(result);
     });
 
 });

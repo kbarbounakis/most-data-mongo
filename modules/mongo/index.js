@@ -451,7 +451,9 @@ class MongoFormatter extends SqlFormatter {
             if (obj.hasOwnProperty('$name')) {
                 // define field for projection e.g. { "field1" : 1 }
                 Object.defineProperty(result, obj.$name, {
-                   value: 1
+                    value: 1,
+                    enumerable: true,
+                    configurable: true
                 });
                 return result;
             }
@@ -460,16 +462,18 @@ class MongoFormatter extends SqlFormatter {
             if (property) {
                 // define field with alias e.g. { "field" : "$field1" }
                 if (typeof obj[property] === 'string') {
-                    Object.defineProperty(result, property, {
-                        value: '$'.concat(obj[property])
-                    });
+                    result[property] = '$'.concat(obj[property]);
                     return result;
                 }
                 if (typeof obj[property] === 'object') {
                     // get property object e.g. { $max: "price" }
                     const propertyValue = obj[property];
-                    Object.defineProperty(result, property, {
-                        value: this.formatFieldEx(propertyValue, format)
+                    result[property] = this.formatFieldEx(propertyValue, format);
+                    // set aggregated flag (this flag is going to be used from mongo formatter)
+                    Object.defineProperty(result, 'aggregated', {
+                        value: true,
+                        enumerable: false,
+                        configurable: false
                     });
                     return result;
                 }
@@ -486,21 +490,37 @@ class MongoFormatter extends SqlFormatter {
             throw new Error('Invalid Argument. Select must be an array of attributes');
         }
         const projection = {};
-        let isAggregated = false;
+        let aggregated = false;
         if (select.indexOf("*") < 0) {
             select.forEach(function (x) {
                 const attr = self.format(x, '%f');
+                if (attr.aggregated) {
+                    // set aggregated flag
+                    aggregated = true;
+                }
                 Object.assign(projection, attr);
             });
         }
-        if (isAggregated) {
+        if (aggregated) {
             const pipeline = [
-                {"$project": projection},
-                {"$match": this.formatWhere(query.$where)}
+                {
+                    "$project": projection
+                },
+                {
+                    "$match": this.formatWhere(query.$where)
+                }
             ];
-            return this.getCollection().aggregate(pipeline).sort(this.formatOrder(query.$order));
+            // check if query contains order expression
+            if (query.$order) {
+                return this.getCollection().aggregate(pipeline).sort(this.formatOrder(query.$order));
+            }
+            // otherwise return data
+            return this.getCollection().aggregate(pipeline);
         } else {
-            return this.getCollection().find(this.formatWhere(query.$where)).project(projection).sort(this.formatOrder(query.$order));
+            if (query.$order) {
+                return this.getCollection().find(this.formatWhere(query.$where)).project(projection).sort(this.formatOrder(query.$order));
+            }
+            return this.getCollection().find(this.formatWhere(query.$where)).project(projection);
         }
     }
 
