@@ -442,6 +442,9 @@ class MongoFormatter extends SqlFormatter {
         super();
         this.getCollection = function () {
             return collection;
+        };
+        this.settings = {
+            nameFormat: '\$$1'
         }
     }
 
@@ -466,15 +469,25 @@ class MongoFormatter extends SqlFormatter {
                     return result;
                 }
                 if (typeof obj[property] === 'object') {
-                    // get property object e.g. { $max: "price" }
-                    const propertyValue = obj[property];
-                    result[property] = this.formatFieldEx(propertyValue, format);
                     // set aggregated flag (this flag is going to be used from mongo formatter)
                     Object.defineProperty(result, 'aggregated', {
                         value: true,
                         enumerable: false,
                         configurable: false
                     });
+                    // get property object e.g. { $max: "price" }
+                    const propertyValue = obj[property];
+                    if (typeof propertyValue === 'object') {
+                        // check if property value is a format function e.g. $year
+                        const formatFunctionName = Object.keys(propertyValue)[0];
+                        if (/^\$/.test(formatFunctionName) && typeof this[formatFunctionName] === 'function') {
+                            const formatFunction = this[formatFunctionName];
+                            result[property] =  formatFunction.apply(this, propertyValue[formatFunctionName]);
+                            return result;
+                        }
+                    }
+                    result[property] = this.formatFieldEx(propertyValue, format);
+
                     return result;
                 }
             }
@@ -587,12 +600,92 @@ class MongoFormatter extends SqlFormatter {
         return cursor.skip(skip).limit(take);
     }
 
-    formatField(obj) {
-
+    escapeName(name) {
+        if (typeof name === 'string')
+            return name.replace(/(\w+)$|^(\w+)$/g, this.settings.nameFormat);
+        if (typeof name === 'object' && name.hasOwnProperty('$name')) {
+            return '$'.concat(name['$name']);
+        }
+        return name;
     }
 
-}
+    // MongoAdapter extensions
+    /**
+     * @param p0
+     * @returns *
+     */
+    $year(p0) {
+        return {
+            $year: this.escapeName(p0)
+        };
+    }
+    /**
+     * @param p0
+     * @returns *
+     */
+    $month(p0) {
+        return {
+            $month: this.escapeName(p0)
+        };
+    }
+    /**
+     * @param p0
+     * @returns *
+     */
+    $day(p0) {
+        return {
+            $dayOfMonth: this.escapeName(p0)
+        };
+    }
+    /**
+     * @param p0
+     * @returns *
+     */
+    $hour(p0) {
+        return {
+            $hour: this.escapeName(p0)
+        };
+    }
+    /**
+     * @param p0
+     * @returns *
+     */
+    $minute(p0) {
+        return {
+            $minute: this.escapeName(p0)
+        };
+    }
+    /**
+     * @param p0
+     * @returns *
+     */
+    $second(p0) {
+        return {
+            $second: this.escapeName(p0)
+        };
+    }
 
+    /**
+     * @param p0
+     * @returns *
+     */
+    $floor(p0) {
+        return {
+            $floor: this.escapeName(p0)
+        };
+    }
+    /**
+     * @param p0
+     * @returns *
+     */
+    $ceiling(p0) {
+        return {
+            $ceil: this.escapeName(p0)
+        };
+    }
+
+
+}
 
 module.exports.MongoAdapter = MongoAdapter;
 module.exports.MongoFormatter = MongoFormatter;

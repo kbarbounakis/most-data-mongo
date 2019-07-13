@@ -39,9 +39,9 @@ describe('test query field format', function () {
         const result = formatter.formatFieldEx(new QueryField().min('price').as('minPrice'), '%f');
         // expected { "field": { "$min": "field1" } }
         assert.isObject(result);
-        assert.property(result, 'price');
-        assert.property(result['price'], '$min');
-        assert.equal(result['price'].$min, '$minPrice');
+        assert.property(result, 'minPrice');
+        assert.property(result['minPrice'], '$min');
+        assert.equal(result['minPrice'].$min, 'price');
     });
 
     it('should format QueryField with function', () => {

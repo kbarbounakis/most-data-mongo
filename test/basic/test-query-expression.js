@@ -6,6 +6,7 @@ const conf = require('./../config/app.test.json');
 const QueryUtils = require('@themost/query').QueryUtils;
 const QueryField = require('@themost/query').QueryField;
 const assert = require('chai').assert;
+
 describe('test mongoDB query expression', function() {
     /**
      * @type MongoAdapter
@@ -126,6 +127,7 @@ describe('test mongoDB query expression', function() {
             assert.isAtLeast(result.length, 1);
             result.forEach( item => {
                 assert.equal(item.additionalType, 'Product');
+                // noinspection JSUnresolvedVariable
                 assert.isAbove(item.price, 1000);
             });
             return done();
@@ -144,6 +146,7 @@ describe('test mongoDB query expression', function() {
             assert.isAtLeast(result.length, 1);
             result.forEach( item => {
                 assert.equal(item.additionalType, 'Product');
+                // noinspection JSUnresolvedVariable
                 assert.isAtLeast(item.price, 1104.46);
             });
             return done();
@@ -162,6 +165,7 @@ describe('test mongoDB query expression', function() {
             assert.isAtLeast(result.length, 1);
             result.forEach( item => {
                 assert.equal(item.additionalType, 'Product');
+                // noinspection JSUnresolvedVariable
                 assert.isBelow(item.price, 1104.46);
             });
             return done();
@@ -180,6 +184,7 @@ describe('test mongoDB query expression', function() {
             assert.isAtLeast(result.length, 1);
             result.forEach( item => {
                 assert.equal(item.additionalType, 'Product');
+                // noinspection JSUnresolvedVariable
                 assert.isAtMost(item.price, 1104.46);
             });
             return done();
@@ -198,7 +203,9 @@ describe('test mongoDB query expression', function() {
             assert.isAtLeast(result.length, 1);
             result.forEach( item => {
                 assert.equal(item.additionalType, 'Product');
+                // noinspection JSUnresolvedVariable
                 assert.isAtMost(item.price, 1104.46);
+                // noinspection JSUnresolvedVariable
                 assert.isAtLeast(item.price, 1040.32);
             });
             return done();
@@ -226,7 +233,6 @@ describe('test mongoDB query expression', function() {
     });
 
     it('should QueryExpression.select(year())', (done) => {
-
         let query = QueryUtils.query('things').select(
             'name',
             QueryField.year('releaseDate').as('releaseDateYear'),
@@ -244,27 +250,33 @@ describe('test mongoDB query expression', function() {
             console.log('INFO', 'QUERY', JSON.stringify(result, null, 4));
             result.forEach( item => {
                 assert.equal(item.additionalType, 'Product');
+                // noinspection JSUnresolvedVariable
                 assert.equal(item.releaseDateYear, 2014);
             });
             return done();
         });
     });
 
-    it('should QueryExpression.select(max(attribute))', (done) => {
 
+    it('should QueryExpression.select(month())', (done) => {
         let query = QueryUtils.query('things').select(
-            new QueryField().max('price')).as('maxPrice')
-            .where('additionalType').equal('Product');
+            'name',
+            QueryField.month('releaseDate').as('releaseDateMonth'),
+            'additionalType')
+            .where('additionalType').equal('Product')
+            .where('releaseDateMonth').equal(2)
+            .take(5);
         console.log('INFO', 'QUERY', JSON.stringify(query, null, 4));
         db.execute(query, null, (err, result) => {
             if (err) {
                 return done(err);
             }
             assert.isArray(result);
-            assert.isAtLeast(result.length, 1);
             console.log('INFO', 'QUERY', JSON.stringify(result, null, 4));
             result.forEach( item => {
                 assert.equal(item.additionalType, 'Product');
+                // noinspection JSUnresolvedVariable
+                assert.equal(item.releaseDateMonth, 2);
             });
             return done();
         });
