@@ -684,6 +684,35 @@ class MongoFormatter extends SqlFormatter {
         };
     }
 
+    /**
+     * @param p0
+     * @returns *
+     */
+    $tolower(p0) {
+        return {
+            $toLower: this.escapeName(p0)
+        };
+    }
+
+    /**
+     * @param p0
+     * @returns *
+     */
+    $toupper(p0) {
+        return {
+            $toUpper: this.escapeName(p0)
+        };
+    }
+    /**
+     * @param p0
+     * @returns *
+     */
+    $length(p0) {
+        return {
+            $length: this.escapeName(p0)
+        };
+    }
+
 
 }
 
