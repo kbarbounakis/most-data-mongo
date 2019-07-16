@@ -1,0 +1,942 @@
+[
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 654.43,
+        "model": "HD2307",
+        "releaseDate": "2015-10-29T23:12:12Z",
+        "name": "Apple MacBook Air (13.3-inch, 2013 Version)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 1104.46,
+        "model": "SM5959",
+        "releaseDate": "2015-11-20T22:55:16Z",
+        "name": "Apple MacBook Pro With Retina Display (15-inch, 2013 Version)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 1040.32,
+        "model": "WN6054",
+        "releaseDate": "2015-04-25T00:05:41Z",
+        "name": "Gateway NE72206u",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 999.08,
+        "model": "HS3900",
+        "releaseDate": "2015-08-07T04:41:13Z",
+        "name": "Alienware 17",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 1529.45,
+        "model": "HR4046",
+        "releaseDate": "2015-01-22T19:15:36Z",
+        "name": "MSI GX70 3BE-007US",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 1553.43,
+        "model": "JE9357",
+        "releaseDate": "2015-10-13T08:55:12Z",
+        "name": "Razer Blade (2013)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 1284.7,
+        "model": "WN9322",
+        "releaseDate": "2015-09-14T20:41:43Z",
+        "name": "Lenovo IdeaPad U430 Touch",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 1237.11,
+        "model": "HS4682",
+        "releaseDate": "2015-05-22T06:21:58Z",
+        "name": "Apple MacBook Air (11.6-inch, 2013 Version)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 389.4,
+        "model": "ZE9658",
+        "releaseDate": "2015-04-22T09:14:10Z",
+        "name": "Sony VAIO Pro 11 and 13",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 967.13,
+        "model": "ZE6713",
+        "releaseDate": "2015-03-18T20:30:45Z",
+        "name": "Lenovo ThinkPad Edge E431",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 865.94,
+        "model": "HR8005",
+        "releaseDate": "2015-08-13T12:18:02Z",
+        "name": "Asus VivoBook X202E-DH31T",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 224.52,
+        "model": "HD2895",
+        "releaseDate": "2015-10-08T15:42:38Z",
+        "name": "Asus Transformer Book T100",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 810.35,
+        "model": "HG3713",
+        "releaseDate": "2015-11-03T21:28:25Z",
+        "name": "Sony VAIO Flip 15",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 1329.29,
+        "model": "HG7360",
+        "releaseDate": "2015-05-16T12:37:42Z",
+        "name": "Lenovo Yoga 2 Pro",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 253.15,
+        "model": "HS6185",
+        "releaseDate": "2015-11-18T23:18:45Z",
+        "name": "Asus Transformer Book T100",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Laptops",
+        "price": 723.75,
+        "model": "SR5571",
+        "releaseDate": "2015-09-16T22:55:15Z",
+        "name": "Google Chromebook Pixel",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 665.41,
+        "model": "HX3028",
+        "releaseDate": "2015-05-13T06:42:59Z",
+        "name": "Dell XPS 27",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 1336.27,
+        "model": "HA6910",
+        "releaseDate": "2015-02-25T16:40:51Z",
+        "name": "Apple iMac (27-Inch, 2013 Version)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 604.6,
+        "model": "HA5036",
+        "releaseDate": "2015-02-27T10:26:23Z",
+        "name": "Dell Inspiron 23",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 1246.45,
+        "model": "BR5111",
+        "releaseDate": "2015-04-15T09:43:25Z",
+        "name": "Maingear Shift Super Stock (2013)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 1627.61,
+        "model": "HS8074",
+        "releaseDate": "2015-06-30T21:18:33Z",
+        "name": "Digital Storm ODE Level 3",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 1549.61,
+        "model": "FY5097",
+        "releaseDate": "2015-10-05T09:21:11Z",
+        "name": "Alienware X51 (2013)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 1219.85,
+        "model": "HD3549",
+        "releaseDate": "2015-04-12T03:56:25Z",
+        "name": "HP Z230 Workstation",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 801.5,
+        "model": "SR9472",
+        "releaseDate": "2015-04-04T04:21:19Z",
+        "name": "Origin Genesis",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 228.05,
+        "model": "WC5547",
+        "releaseDate": "2015-03-12T10:13:16Z",
+        "name": "Zotac Zbox Nano XS AD13 Plus",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 1395.9,
+        "model": "LD4238",
+        "releaseDate": "2015-07-09T03:21:44Z",
+        "name": "Dell XPS 18",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 476.49,
+        "model": "JE7941",
+        "releaseDate": "2015-01-09T08:35:24Z",
+        "name": "Lenovo IdeaCentre Horizon",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Desktops",
+        "price": 798.36,
+        "model": "SR6807",
+        "releaseDate": "2015-08-09T21:43:44Z",
+        "name": "Apple iMac (27-Inch, 2013 Version)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 177.44,
+        "model": "ZE6015",
+        "releaseDate": "2015-11-25T12:09:51Z",
+        "name": "Apple iPad Air",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 1438.82,
+        "model": "JE7519",
+        "releaseDate": "2015-09-23T04:31:49Z",
+        "name": "Google Nexus 7 (2013)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 1232.21,
+        "model": "HX5535",
+        "releaseDate": "2015-02-18T15:58:12Z",
+        "name": "Sony Xperia Tablet Z",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 1104.61,
+        "model": "HR6205",
+        "releaseDate": "2015-11-22T03:51:19Z",
+        "name": "Samsung Galaxy Note 10.1 (2014 Edition)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 358.09,
+        "model": "WC7723",
+        "releaseDate": "2015-02-02T00:44:28Z",
+        "name": "Asus MeMO Pad HD 7",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 290.47,
+        "model": "HA4260",
+        "releaseDate": "2015-06-13T19:49:00Z",
+        "name": "Lenovo ThinkPad Tablet 2",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 1127.53,
+        "model": "HA9708",
+        "releaseDate": "2015-08-26T23:54:03Z",
+        "name": "Amazon Kindle Paperwhite (2013, Wi-Fi)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 946.92,
+        "model": "ZE6412",
+        "releaseDate": "2015-01-11T19:34:20Z",
+        "name": "Kobo Aura",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 740.85,
+        "model": "SM7016",
+        "releaseDate": "2015-02-26T04:24:54Z",
+        "name": "Amazon Kindle Fire HDX (7-Inch)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Tablets and E-Readers",
+        "price": 359.09,
+        "model": "HX7124",
+        "releaseDate": "2015-08-27T17:04:05Z",
+        "name": "Belkin Ultimate Keyboard Case for iPad",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Printers",
+        "price": 890.93,
+        "model": "LD3665",
+        "releaseDate": "2015-06-12T03:30:23Z",
+        "name": "HP Officejet Pro X576dw Multifunction Printer",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Printers",
+        "price": 842.86,
+        "model": "HG4494",
+        "releaseDate": "2015-10-06T02:05:25Z",
+        "name": "Dell B1163w Mono Laser Multifunction Printer",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Printers",
+        "price": 885.69,
+        "model": "BR6227",
+        "releaseDate": "2015-01-03T10:51:23Z",
+        "name": "Canon Pixma MG5420 Wireless Photo All-in-One Printer",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Printers",
+        "price": 737.07,
+        "model": "HD4124",
+        "releaseDate": "2015-02-18T11:20:21Z",
+        "name": "OKI C331dn",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Printers",
+        "price": 333.44,
+        "model": "WC6395",
+        "releaseDate": "2015-08-08T12:51:49Z",
+        "name": "Dell B3460dn Mono Laser Printer",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Printers",
+        "price": 686.09,
+        "model": "HX5246",
+        "releaseDate": "2015-08-06T19:37:34Z",
+        "name": "Dell B1163w Mono Laser Multifunction Printer",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Printers",
+        "price": 429.18,
+        "model": "SM5111",
+        "releaseDate": "2015-10-23T14:31:53Z",
+        "name": "Brother MFC-J6920DW",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 194.61,
+        "model": "SM5853",
+        "releaseDate": "2015-10-07T13:46:48Z",
+        "name": "Intel Core i7-4960X Extreme Edition",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 1032.14,
+        "model": "HG3016",
+        "releaseDate": "2015-02-16T07:03:39Z",
+        "name": "Intel Core i7-4770K",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 1166.4,
+        "model": "HA2325",
+        "releaseDate": "2015-09-26T12:35:56Z",
+        "name": "AMD A10-6700",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 1640.22,
+        "model": "HX2794",
+        "releaseDate": "2015-11-24T02:13:19Z",
+        "name": "Nvidia GeForce GTX 780 Ti",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 427.96,
+        "model": "SR1434",
+        "releaseDate": "2015-03-07T01:08:21Z",
+        "name": "AMD Radeon R9 290",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 508.93,
+        "model": "HG7687",
+        "releaseDate": "2014-11-26T21:52:29Z",
+        "name": "AMD Radeon R9 270X",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 1625.49,
+        "model": "HR5845",
+        "releaseDate": "2015-09-20T03:35:33Z",
+        "name": "Nvidia GeForce GTX 650 Ti Boost",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 283.15,
+        "model": "ZE5591",
+        "releaseDate": "2015-11-21T08:43:10Z",
+        "name": "In Win H-Frame",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 522.89,
+        "model": "HX9638",
+        "releaseDate": "2015-05-16T20:24:50Z",
+        "name": "Lian Li PC-X2000FN",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 1041.86,
+        "model": "SR8183",
+        "releaseDate": "2014-11-27T01:23:21Z",
+        "name": "Rosewill Thor V2-W",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 1271,
+        "model": "HX3991",
+        "releaseDate": "2015-01-25T22:31:21Z",
+        "name": "SilverStone Sugo SG10",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "PC Components",
+        "price": 1254.64,
+        "model": "HA2128",
+        "releaseDate": "2015-02-04T15:02:22Z",
+        "name": "MSI Z87 MPower Max",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Storage and Networking Gear",
+        "price": 647.13,
+        "model": "FY8135",
+        "releaseDate": "2015-01-15T18:07:42Z",
+        "name": "LaCie Blade Runner",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Storage and Networking Gear",
+        "price": 969.57,
+        "model": "ZE7551",
+        "releaseDate": "2015-11-19T20:05:29Z",
+        "name": "Buffalo DriveStation DDR (HD-GD2.0U3)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Storage and Networking Gear",
+        "price": 1314.05,
+        "model": "HR3906",
+        "releaseDate": "2015-07-11T06:43:58Z",
+        "name": "Western Digital My Passport Slim (1TB)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Storage and Networking Gear",
+        "price": 844.37,
+        "model": "SM8796",
+        "releaseDate": "2015-07-18T12:12:27Z",
+        "name": "Samsung SSD 840 EVO (500GB)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Storage and Networking Gear",
+        "price": 1266.38,
+        "model": "BR7829",
+        "releaseDate": "2015-03-28T02:11:11Z",
+        "name": "SanDisk Ultra Plus (256GB)",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Storage and Networking Gear",
+        "price": 1027.39,
+        "model": "FY9396",
+        "releaseDate": "2015-05-30T18:26:27Z",
+        "name": "Seagate Central",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Storage and Networking Gear",
+        "price": 494.92,
+        "model": "HS4752",
+        "releaseDate": "2015-07-20T13:56:37Z",
+        "name": "Buffalo AirStation Extreme AC 1750 Gigabit Dual Band Wireless Router",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 552.17,
+        "model": "HA8373",
+        "releaseDate": "2015-11-10T19:40:13Z",
+        "name": "Corsair K70 Mechanical Gaming Keyboard",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 1177.68,
+        "model": "HR6316",
+        "releaseDate": "2015-03-30T00:31:11Z",
+        "name": "Logitech Bluetooth Illuminated Keyboard K810",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:04Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 688.2,
+        "model": "LD2914",
+        "releaseDate": "2015-11-06T00:33:13Z",
+        "name": "HP Touch to Pair Mouse",
+        "dateCreated": "2015-11-23T14:53:04Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 859.46,
+        "model": "HD5277",
+        "releaseDate": "2015-10-20T15:48:34Z",
+        "name": "Roccat Kone XTD",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 123.36,
+        "model": "ZE1126",
+        "releaseDate": "2015-06-08T16:38:32Z",
+        "name": "Microsoft Sculpt Mobile Mouse",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 713.53,
+        "model": "HX2100",
+        "releaseDate": "2015-01-24T14:22:24Z",
+        "name": "Acer B296CL",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 541.23,
+        "model": "HA9104",
+        "releaseDate": "2015-04-23T10:01:42Z",
+        "name": "NEC MultiSync EA244WMi",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 1313.84,
+        "model": "HX9635",
+        "releaseDate": "2015-01-31T17:59:55Z",
+        "name": "KEF X300A",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 1232.47,
+        "model": "WN1591",
+        "releaseDate": "2015-05-31T13:08:04Z",
+        "name": "Flip-Pal Mobile Scanner",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "LCDs and Peripherals",
+        "price": 1355.55,
+        "model": "SM7698",
+        "releaseDate": "2015-06-26T04:00:11Z",
+        "name": "Epson PowerLite Home Cinema 5020UBe",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Cameras and HDTVs",
+        "price": 1298.29,
+        "model": "HG5711",
+        "releaseDate": "2015-10-05T11:34:16Z",
+        "name": "Sony Cyber-shot DSC-RX100 II",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Cameras and HDTVs",
+        "price": 788.36,
+        "model": "HR2087",
+        "releaseDate": "2015-02-09T13:34:37Z",
+        "name": "Canon PowerShot A1400",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Cameras and HDTVs",
+        "price": 656.21,
+        "model": "JE5602",
+        "releaseDate": "2015-02-20T09:15:34Z",
+        "name": "Canon PowerShot SX280 HS",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Cameras and HDTVs",
+        "price": 1597.86,
+        "model": "HG8025",
+        "releaseDate": "2015-02-27T04:34:30Z",
+        "name": "Olympus OM-D E-M1",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Cameras and HDTVs",
+        "price": 944.05,
+        "model": "ZE2916",
+        "releaseDate": "2015-08-14T10:15:37Z",
+        "name": "Nikon D7100",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Cameras and HDTVs",
+        "price": 263.56,
+        "model": "FY5348",
+        "releaseDate": "2015-05-13T04:07:23Z",
+        "name": "Samsung PN60F8500",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Smartphones and Mobile Gadgets",
+        "price": 1211.36,
+        "model": "FY7572",
+        "releaseDate": "2015-09-23T17:48:14Z",
+        "name": "Apple iPhone 5s",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Smartphones and Mobile Gadgets",
+        "price": 665.04,
+        "model": "HS3606",
+        "releaseDate": "2015-04-14T23:23:34Z",
+        "name": "Samsung Galaxy S4",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Smartphones and Mobile Gadgets",
+        "price": 441.36,
+        "model": "WC3874",
+        "releaseDate": "2015-06-25T15:28:51Z",
+        "name": "Samsung Galaxy Note 3",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Smartphones and Mobile Gadgets",
+        "price": 618.23,
+        "model": "HG4144",
+        "releaseDate": "2015-08-31T05:25:11Z",
+        "name": "Apple iPod Touch (2013 Version)",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Smartphones and Mobile Gadgets",
+        "price": 155.27,
+        "model": "HS5288",
+        "releaseDate": "2015-06-24T21:57:56Z",
+        "name": "Bose SoundLink Bluetooth Mobile Speaker II",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Smartphones and Mobile Gadgets",
+        "price": 913.78,
+        "model": "HA4636",
+        "releaseDate": "2015-02-19T10:22:14Z",
+        "name": "Skullcandy PLYR 1",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Smartphones and Mobile Gadgets",
+        "price": 339.34,
+        "model": "HD8135",
+        "releaseDate": "2015-11-03T08:40:58Z",
+        "name": "Bose QuietComfort 20i",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Smartphones and Mobile Gadgets",
+        "price": 413.95,
+        "model": "HR5528",
+        "releaseDate": "2015-04-14T00:09:50Z",
+        "name": "Nintendo 2DS",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Software and Services",
+        "price": 191.71,
+        "model": "SR1576",
+        "releaseDate": "2015-01-19T02:47:40Z",
+        "name": "Apple OS X 10.9 (?Mavericks?)",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Software and Services",
+        "price": 455.44,
+        "model": "BR2729",
+        "releaseDate": "2015-09-19T22:09:30Z",
+        "name": "Microsoft Office 365 Home Premium",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Software and Services",
+        "price": 1096.08,
+        "model": "HS2847",
+        "releaseDate": "2015-07-31T17:42:10Z",
+        "name": "McAfee LiveSafe",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Software and Services",
+        "price": 1169.43,
+        "model": "FY9356",
+        "releaseDate": "2015-08-11T04:59:06Z",
+        "name": "BioShock Infinite",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Software and Services",
+        "price": 470.72,
+        "model": "SR6072",
+        "releaseDate": "2015-06-11T00:50:40Z",
+        "name": "Flipboard for iPad",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    },
+    {
+        "additionalType": "Product",
+        "category": "Software and Services",
+        "price": 116.98,
+        "model": "SR7639",
+        "releaseDate": "2015-08-29T02:35:51Z",
+        "name": "Evernote 5",
+        "dateCreated": "2015-11-23T14:53:05Z",
+        "dateModified": "2015-11-23T14:53:05Z"
+    }
+]
