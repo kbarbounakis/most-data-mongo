@@ -128,7 +128,7 @@ function executeDelete(query) {
              * @type {Db|*}
              */
             const db = self.rawConnection;
-            return db.collection(entity, {strict: true}, function (err, collection) {
+            return db.collection(entity, {strict: false}, function (err, collection) {
                 if (err) {
                     return reject(err);
                 }
@@ -168,7 +168,7 @@ function executeUpdate(query) {
             /**
              * @type {Db|*}             */
             const db = self.rawConnection;
-            return db.collection(entity, {strict: true}, function (err, collection) {
+            return db.collection(entity, {strict: false}, function (err, collection) {
                 if (err) {
                     return reject(err);
                 }
@@ -215,7 +215,7 @@ function executeSelect(query) {
              * @type {Db|*}
              */
             const db = self.rawConnection;
-            return db.collection(entity, {strict: true}, function (err, collection) {
+            return db.collection(entity, {strict: false}, function (err, collection) {
                 const formatter = new MongoFormatter(collection);
                 return formatter.formatLimitSelect(query).toArray(function (err, result) {
                     if (err) {
@@ -253,8 +253,13 @@ class MongoAdapter {
 
         options.options = options.options || {};
         Object.assign(options.options, {
-            "useNewUrlParser": true,
-            "db": options.database
+            "useNewUrlParser": true
+        });
+
+        Object.defineProperty(options.options, 'db', {
+            value: options.database,
+            configurable: false,
+            enumerable: false
         });
 
         Object.defineProperty(this, 'connectionURL', {
