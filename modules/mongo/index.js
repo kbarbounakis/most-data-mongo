@@ -503,7 +503,7 @@ class MongoFormatter extends SqlFormatter {
 
     formatSelect(query) {
         const self = this;
-        const select = query.$select[this.getCollection().s.name] || ['*'];
+        const select = query.$select[this.getCollection().collectionName] || ['*'];
         if (!Array.isArray(select)) {
             throw new Error('Invalid Argument. Select must be an array of attributes');
         }
@@ -543,7 +543,7 @@ class MongoFormatter extends SqlFormatter {
     }
 
     formatInsert(query) {
-        const insert = query.$insert[this.getCollection().s.name];
+        const insert = query.$insert[this.getCollection().collectionName];
         if (insert == null) {
             throw new Error('Invalid Argument. Expected object or array');
         }
@@ -551,7 +551,7 @@ class MongoFormatter extends SqlFormatter {
     }
 
     formatUpdate(query) {
-        const update = query.$update[this.getCollection().s.name];
+        const update = query.$update[this.getCollection().collectionName];
         if (update == null) {
             throw new Error('Invalid Argument. Expected object or array');
         }
