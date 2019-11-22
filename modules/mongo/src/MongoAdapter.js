@@ -1,56 +1,14 @@
 /**
- * @license
  * MOST Web Framework 2.0 Codename Blueshift
  * Copyright (c) 2017, THEMOST LP All rights reserved
  *
  * Use of this source code is governed by an BSD-3-Clause license that can be
  * found in the LICENSE file at https://themost.io/license
  */
-const QueryField = require("@themost/query").QueryField;
-const MongoClient = require('mongodb').MongoClient;
-const SqlFormatter = require('@themost/query').SqlFormatter;
 
-/**
- * @interface MongoAdapterOptions
- */
 
-/**
- *
- * Gets or sets a string which represents mongoDB server address
- * @member MongoAdapterOptions#host
- * @type {string}
- */
-/**
- * Gets or sets a number which represents mongoDB server port
- * @member MongoAdapterOptions#port
- * @type {number}
- */
-/**
- * Gets or sets a string which represents the target mongoDB  databas
- * @member MongoAdapterOptions#database
- * @type {string}
- */
-/**
- * Gets or sets a string which represents a mongoDB authentication database that is going to used while connecting
- * @member MongoAdapterOptions#authenticationDatabase
- * @type {string}
- */
-/**
- * Gets or sets a string which represents a user name that is going to used while connecting
- * @member MongoAdapterOptions#user
- * @type {string}
- */
-/**
- * Gets or sets a string which represents user password that is going to used while connecting
- * @member MongoAdapterOptions#password
- * @type {string}
- */
-
-/**
- * Gets or sets an object which contains extra options for mongoDB connection
- * @member MongoAdapterOptions#options
- * @type {*}
- */
+import {MongoFormatter} from "./MongoFormatter";
+import {MongoClient} from "mongodb";
 
 /**
  * @param {{$insert:*}|*} query
@@ -78,6 +36,9 @@ function executeInsert(query) {
                     return reject(err);
                 }
                 const formatter = new MongoFormatter(collection);
+                /**
+                 * @type {*}
+                 */
                 const obj = formatter.formatInsert(query);
                 if (Array.isArray(obj)) {
                     // noinspection JSUnresolvedFunction
@@ -194,6 +155,8 @@ function executeUpdate(query) {
     });
 }
 
+
+
 /**
  * @param {{$select:*,$where:*}|*} query
  * @returns {Promise}
@@ -228,7 +191,11 @@ function executeSelect(query) {
     });
 }
 
-class MongoAdapter {
+
+/**
+ *
+ */
+export class MongoAdapter {
     /**
      *
      * @param {MongoAdapterOptions} options
@@ -284,13 +251,14 @@ class MongoAdapter {
      * @returns {*}
      */
     createView(name, query, callback) {
-        callback = callback || function () {};
+        callback = callback || function () {
+        };
         return callback();
     }
 
     /**
      * Opens a database connection
-     * @param {Function} callback
+     * @param {MongoAdapterExecuteCallback} callback
      */
     open(callback) {
         if (this.rawConnection != null) {
@@ -305,6 +273,22 @@ class MongoAdapter {
             }
             self.rawConnection = mongoClient.db(connectionOptions.db);
             return callback();
+        });
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * Opens database connection
+     * @returns {Promise<*>}
+     */
+    openAsync() {
+        return new Promise((resolve, reject) => {
+            return this.open( err => {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve();
+            })
         });
     }
 
@@ -332,6 +316,22 @@ class MongoAdapter {
 
     // noinspection JSUnusedGlobalSymbols
     /**
+     * Closes database connection
+     * @returns {Promise<*>}
+     */
+    closeAsync() {
+        return new Promise((resolve, reject) => {
+            return this.close( err => {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve();
+            })
+        });
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
      *
      * @param {*} migrationScheme - An object that represents the data model migrationScheme we want to migrate
      * @param {Function} callback - A callback function
@@ -347,7 +347,7 @@ class MongoAdapter {
             });
             if (counter) {
                 // add default counter if any
-                return self.rawConnection.collection('counters', function (err, counters) {
+                return self.rawConnection.collection('counters', function (err) {
                     if (err) {
                         return callback(err);
                     }
@@ -364,6 +364,20 @@ class MongoAdapter {
         });
     }
 
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * @param {*} migration
+     */
+    migrateAsync(migration) {
+        return new Promise((resolve, reject) => {
+            return this.migrate(migration, (err) => {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve();
+            })
+        });
+    }
 
     // noinspection JSUnusedGlobalSymbols
     /**
@@ -393,6 +407,24 @@ class MongoAdapter {
                     callback(null, result.value.seq);
                 });
             });
+        });
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * Produces a new identity value for the given entity and attribute.
+     * @param {string} entity The target entity name
+     * @param {string} attribute The target attribute
+     * @returns Promise<*>
+     */
+    selectIdentityAsync(entity, attribute) {
+        return new Promise((resolve, reject) => {
+            return this.selectIdentity(entity, attribute, (err, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve(result);
+            })
         });
     }
 
@@ -437,297 +469,76 @@ class MongoAdapter {
         return callback(new Error('Not yet implemented'));
     }
 
-}
-
-class MongoFormatter extends SqlFormatter {
+    // noinspection JSUnusedGlobalSymbols
     /**
-     * @param {Collection=} collection
+     * Executes the specified query against the underlying database and returns a result set.
+     * @param {*} query
+     * @param {Array<*>=} values
+     * @returns {Promise<*>}
      */
-    constructor(collection) {
-        super();
-        this.getCollection = function () {
-            return collection;
-        };
-        this.settings = {
-            nameFormat: '\$$1'
-        }
-    }
-
-    formatFieldEx(obj, format) {
-        if (typeof obj === 'object') {
-            let result = { };
-            if (obj.hasOwnProperty('$name')) {
-                // define field for projection e.g. { "field1" : 1 }
-                Object.defineProperty(result, obj.$name, {
-                    value: 1,
-                    enumerable: true,
-                    configurable: true
-                });
-                return result;
-            }
-            // get property name
-            const property = Object.keys(obj)[0];
-            if (property) {
-                // define field with alias e.g. { "field" : "$field1" }
-                if (typeof obj[property] === 'string') {
-                    result[property] = '$'.concat(obj[property]);
-                    return result;
+    executeAsync(query, values) {
+        return new Promise((resolve, reject) => {
+            return this.execute(query, values, (err, result) => {
+                if (err) {
+                    return reject(err);
                 }
-                if (typeof obj[property] === 'object') {
-                    // set aggregated flag (this flag is going to be used from mongo formatter)
-                    Object.defineProperty(result, 'aggregated', {
-                        value: true,
-                        enumerable: false,
-                        configurable: false
-                    });
-                    // get property object e.g. { $max: "price" }
-                    const propertyValue = obj[property];
-                    if (typeof propertyValue === 'object') {
-                        // check if property value is a format function e.g. $year
-                        const formatFunctionName = Object.keys(propertyValue)[0];
-                        if (/^\$/.test(formatFunctionName) && typeof this[formatFunctionName] === 'function') {
-                            const formatFunction = this[formatFunctionName];
-                            result[property] =  formatFunction.apply(this, propertyValue[formatFunctionName]);
-                            return result;
-                        }
-                    }
-                    result[property] = this.formatFieldEx(propertyValue, format);
-
-                    return result;
-                }
-            }
-            throw new Error('Not yet implemented');
-        }
-        throw new TypeError('Expected an instance of QueryField');
-    }
-
-    formatSelect(query) {
-        const self = this;
-        const select = query.$select[this.getCollection().collectionName] || ['*'];
-        if (!Array.isArray(select)) {
-            throw new Error('Invalid Argument. Select must be an array of attributes');
-        }
-        const projection = {};
-        let aggregated = false;
-        if (select.indexOf("*") < 0) {
-            select.forEach(function (x) {
-                const attr = self.format(x, '%f');
-                if (attr.aggregated) {
-                    // set aggregated flag
-                    aggregated = true;
-                }
-                Object.assign(projection, attr);
-            });
-        }
-        if (aggregated) {
-            const pipeline = [
-                {
-                    "$project": projection
-                },
-                {
-                    "$match": this.formatWhere(query.$where)
-                }
-            ];
-            // check if query contains order expression
-            if (query.$order) {
-                return this.getCollection().aggregate(pipeline).sort(this.formatOrder(query.$order));
-            }
-            // otherwise return data
-            return this.getCollection().aggregate(pipeline);
-        } else {
-            if (query.$order) {
-                return this.getCollection().find(this.formatWhere(query.$where)).project(projection).sort(this.formatOrder(query.$order));
-            }
-            return this.getCollection().find(this.formatWhere(query.$where)).project(projection);
-        }
-    }
-
-    formatInsert(query) {
-        const insert = query.$insert[this.getCollection().collectionName];
-        if (insert == null) {
-            throw new Error('Invalid Argument. Expected object or array');
-        }
-        return insert;
-    }
-
-    formatUpdate(query) {
-        const update = query.$update[this.getCollection().collectionName];
-        if (update == null) {
-            throw new Error('Invalid Argument. Expected object or array');
-        }
-        return update;
-    }
-
-    formatDelete(query) {
-        const remove = query.$where;
-        if (remove == null) {
-            throw new Error('Invalid Argument. Expected expression');
-        }
-        return remove;
-    }
-    formatWhere(where) {
-        return where;
-    }
-
-    /**
-     *
-     * @param {*} order
-     */
-    formatOrder(order) {
-        const result = {};
-        if (order == null)
-            return result;
-        order.forEach(function (x) {
-            const f = x.$desc ? x.$desc : x.$asc;
-            const flag = x.$desc ? -1 : 1;
-            if (Array.isArray(f)) {
-                f.forEach(function (y) {
-                    result[y] = flag;
-                });
-            } else {
-                result[f] = flag;
-            }
+                return resolve(result);
+            })
         });
-        return result;
-    }
-
-    formatLimitSelect(query) {
-        const cursor = this.formatSelect(query);
-        let skip = 0;
-        if ((typeof query.$skip === 'number') && parseInt(query.$skip, 10) > 0)
-            skip = parseInt(query.$skip);
-        let take = 25;
-        if ((typeof query.$take === 'number') && parseInt(query.$take, 10) < 0)
-        //do select without paging
-            return cursor;
-        if ((typeof query.$take === 'number') && parseInt(query.$take) > 0)
-            take = parseInt(query.$take);
-        return cursor.skip(skip).limit(take);
-    }
-
-    escapeName(name) {
-        if (typeof name === 'string')
-            return name.replace(/(\w+)$|^(\w+)$/g, this.settings.nameFormat);
-        if (typeof name === 'object' && name.hasOwnProperty('$name')) {
-            return '$'.concat(name['$name']);
-        }
-        return name;
-    }
-
-    // MongoAdapter extensions
-    /**
-     * @param p0
-     * @returns *
-     */
-    $year(p0) {
-        return {
-            $year: this.escapeName(p0)
-        };
-    }
-    /**
-     * @param p0
-     * @returns *
-     */
-    $month(p0) {
-        return {
-            $month: this.escapeName(p0)
-        };
-    }
-    /**
-     * @param p0
-     * @returns *
-     */
-    $day(p0) {
-        return {
-            $dayOfMonth: this.escapeName(p0)
-        };
-    }
-    /**
-     * @param p0
-     * @returns *
-     */
-    $hour(p0) {
-        return {
-            $hour: this.escapeName(p0)
-        };
-    }
-    /**
-     * @param p0
-     * @returns *
-     */
-    $minute(p0) {
-        return {
-            $minute: this.escapeName(p0)
-        };
-    }
-    /**
-     * @param p0
-     * @returns *
-     */
-    $second(p0) {
-        return {
-            $second: this.escapeName(p0)
-        };
     }
 
     /**
-     * @param p0
-     * @returns *
+     * Begins a transactional operation by executing the given function
+     * @param {MongoTransactionFunctionCallback} transactionFunc
+     * @param {MongoAdapterExecuteCallback} callback
+     * @returns {*}
      */
-    $floor(p0) {
-        return {
-            $floor: this.escapeName(p0)
+    executeInTransaction(transactionFunc, callback) {
+        transactionFunc = transactionFunc || function() {
         };
-    }
-    /**
-     * @param p0
-     * @returns *
-     */
-    $ceiling(p0) {
-        return {
-            $ceil: this.escapeName(p0)
+        callback = callback || function() {
         };
-    }
-
-    /**
-     * @param p0
-     * @returns *
-     */
-    $tolower(p0) {
-        return {
-            $toLower: this.escapeName(p0)
-        };
+        return this.open( err => {
+            if (err) {
+                return callback();
+            }
+            transactionFunc.bind(this)( err => {
+               if (err) {
+                   return callback(err);
+               }
+               return callback();
+            });
+        });
     }
 
+    // noinspection JSUnusedGlobalSymbols
     /**
-     * @param p0
-     * @returns *
+     * Begins a transactional operation by executing the given function
+     * @param {MongoTransactionFunction} transactionFunc
+     * @returns {Promise<void>}
      */
-    $toupper(p0) {
-        return {
-            $toUpper: this.escapeName(p0)
-        };
+    executeInTransactionAsync(transactionFunc) {
+        return new Promise((resolve, reject) => {
+            this.executeInTransaction((cb) => {
+                transactionFunc.bind(this)().then(() => {
+                    return cb();
+                }).catch( err => {
+                    return cb(err);
+                });
+            }, ((error) => {
+                if (error) {
+                    return reject(error);
+                }
+                return resolve();
+            }));
+        });
     }
-    /**
-     * @param p0
-     * @returns *
-     */
-    $length(p0) {
-        return {
-            $length: this.escapeName(p0)
-        };
-    }
-
-
 }
-
-module.exports.MongoAdapter = MongoAdapter;
-module.exports.MongoFormatter = MongoFormatter;
+// noinspection JSUnusedGlobalSymbols
 /**
  * Creates an instance of MongoAdapter object that represents a mongoDB database connection.
- * @param {{host:string,port:number,user:string,password:string,options:*}|*} options - An object that represents the properties of the underlying database connection.
- * @returns {DataAdapter|*}
+ * @param {MongoAdapterOptions} options
  */
-module.exports.createInstance = function (options) {
+export function createInstance(options) {
     return new MongoAdapter(options);
-};
+}

@@ -1,2 +1,0 @@
-exit: true
-require: '@babel/register'
