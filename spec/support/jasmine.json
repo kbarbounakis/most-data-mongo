@@ -4,6 +4,7 @@
     "../modules/mongo/src/**/*[sS]pec.js"
   ],
   "helpers": [
+    "./helpers/env.js",
     "./helpers/**/*.js"
   ],
   "stopSpecOnExpectationFailure": false,

@@ -9,7 +9,8 @@
 
 import {MongoFormatter} from "./MongoFormatter";
 import {MongoClient} from "mongodb";
-
+import {QueryExpression} from "@themost/query";
+const debug = require('debug')('themost-framework:mongo');
 /**
  * @param {{$insert:*}|*} query
  * @returns {Promise}
@@ -31,7 +32,9 @@ function executeInsert(query) {
              * @type {Db|*}
              */
             const db = self.rawConnection;
-            return db.collection(entity, {strict: false}, function (err, collection) {
+            return db.collection(entity, {
+                strict: false
+            }, function (err, collection) {
                 if (err) {
                     return reject(err);
                 }
@@ -50,7 +53,13 @@ function executeInsert(query) {
                     });
                 } else if (typeof obj === 'object') {
                     // noinspection JSUnresolvedFunction
-                    return collection.insertOne(obj, function (err, result) {
+                    const insertOptions = {
+                    };
+                    if (self.transaction) {
+                        // assign session
+                    }
+                    debug('info', `db.${collection.collectionName}.insertOne(${JSON.stringify(obj).substr(0,255)})`);
+                    return collection.insertOne(obj, insertOptions, function (err, result) {
                         if (err) {
                             return reject(err);
                         }
@@ -89,13 +98,22 @@ function executeDelete(query) {
              * @type {Db|*}
              */
             const db = self.rawConnection;
-            return db.collection(entity, {strict: false}, function (err, collection) {
+            return db.collection(entity, {
+                strict: false
+            }, function (err, collection) {
                 if (err) {
                     return reject(err);
                 }
                 const formatter = new MongoFormatter(collection);
                 const where = formatter.formatDelete(query);
-                return collection.removeMany(where, function (err, result) {
+                // noinspection JSUnresolvedFunction
+                const removeOptions = {
+                };
+                if (self.transaction) {
+                    // assign session
+                }
+                debug('info', `db.${collection.collectionName}.removeMany(${JSON.stringify(where)})`);
+                return collection.removeMany(where, removeOptions, function (err, result) {
                     if (err) {
                         return reject(err);
                     }
@@ -129,7 +147,9 @@ function executeUpdate(query) {
             /**
              * @type {Db|*}             */
             const db = self.rawConnection;
-            return db.collection(entity, {strict: false}, function (err, collection) {
+            return db.collection(entity, {
+                strict: false
+            }, function (err, collection) {
                 if (err) {
                     return reject(err);
                 }
@@ -140,8 +160,14 @@ function executeUpdate(query) {
                     const update = {
                         $set: obj
                     };
+                    const updateOptions = {
+                    };
+                    if (self.transaction) {
+                        // assign session
+                    }
+                    debug('info', `db.${collection.collectionName}.updateMany(${JSON.stringify(filter)}, ${JSON.stringify(update)})`);
                     // noinspection JSUnresolvedFunction
-                    return collection.updateMany(filter, update, function (err, result) {
+                    return collection.updateMany(filter, update, updateOptions, function (err, result) {
                         if (err) {
                             return reject(err);
                         }
@@ -178,12 +204,38 @@ function executeSelect(query) {
              * @type {Db|*}
              */
             const db = self.rawConnection;
-            return db.collection(entity, {strict: false}, function (err, collection) {
+            return db.collection(entity, {
+                strict: false
+            }, function (err, collection) {
+                const selectOptions = {
+                };
+                if (self.transaction) {
+                    // assign session
+                }
                 const formatter = new MongoFormatter(collection);
-                return formatter.formatLimitSelect(query).toArray(function (err, result) {
+                const q = formatter.formatSelect(query);
+                // if query is a count only query
+                return q.toArray(function (err, result) {
                     if (err) {
                         return reject(err);
                     }
+                    // if query is a count only expression
+                    if (query.$count) {
+                        // if result has no items count is zero
+                        if (result.length === 0) {
+                            // so create item
+                            const countItem = { };
+                            // define count property to zero
+                            Object.defineProperty(countItem, query.$count, {
+                               writable: true,
+                                enumerable: true,
+                                configurable: true,
+                                value: 0
+                            });
+                            result.push(countItem);
+                        }
+                    }
+                    // and finally return result
                     return resolve(result);
                 });
             });
@@ -269,8 +321,11 @@ export class MongoAdapter {
         const connectionOptions = this.connectionOptions;
         MongoClient.connect(this.connectionURL, connectionOptions, function (err, mongoClient) {
             if (err) {
+                debug('error', 'open()', err);
                 return callback(err);
             }
+            debug('info', 'open()');
+            self.rawClient = mongoClient;
             self.rawConnection = mongoClient.db(connectionOptions.db);
             return callback();
         });
@@ -297,20 +352,26 @@ export class MongoAdapter {
      * @param {Function} callback
      */
     close(callback) {
-        if (this.rawConnection == null) {
+        const self = this;
+        callback = callback || function() { };
+        if (self.rawConnection == null) {
             //the connection is already closed
             return callback();
         }
-        const self = this;
         try {
-            self.rawConnection.close(true);
-            process.nextTick(function () {
+            self.rawClient.close( err => {
+                if (err) {
+                    debug('error', 'close()', err);
+                }
+                debug('info', 'close()', err);
                 delete self.rawConnection;
+                delete self.rawClient;
                 return callback();
             });
         } catch (err) {
             delete self.rawConnection;
-            return callback();
+            delete self.rawClient;
+            return callback(err);
         }
     }
 
@@ -342,25 +403,34 @@ export class MongoAdapter {
             if (err) {
                 return callback(err);
             }
-            let counter = migrationScheme.add.find(function (x) {
-                return x.type === 'Counter';
-            });
-            if (counter) {
-                // add default counter if any
-                return self.rawConnection.collection('counters', function (err) {
+            // set migrations query
+            const selectQuery = new QueryExpression().from('migrations')
+                .select('model', 'appliesTo', 'version')
+                .where('version').equal(migrationScheme.version)
+                .and('appliesTo').equal(migrationScheme.appliesTo);
+            return self.execute(selectQuery, null, (err, result) => {
+                if (err) {
+                    return callback(err);
+                }
+                if (result.length > 0) {
+                    migrationScheme.updated = true;
+                    return callback();
+                }
+                // add migration
+                const updateQuery = new QueryExpression().insert({
+                    model: migrationScheme.name,
+                    appliesTo: migrationScheme.appliesTo,
+                    version: migrationScheme.version
+                }).into('migrations');
+                return self.execute(updateQuery, null, (err) => {
                     if (err) {
                         return callback(err);
                     }
-                    self.counters = self.counters || [];
-                    if (typeof self.counters.find(function (x) {
-                        return (x.entity === migrationScheme.appliesTo) && (x.attribute === counter.name);
-                    }) === 'undefined') {
-                        self.counters.push({entity: migrationScheme.appliesTo, attribute: counter.name});
-                    }
-                    return callback(null, true);
+                    migrationScheme.updated = false;
+                    return callback();
                 });
-            }
-            return callback(null, true);
+            });
+
         });
     }
 
@@ -502,12 +572,56 @@ export class MongoAdapter {
             if (err) {
                 return callback();
             }
-            transactionFunc.bind(this)( err => {
-               if (err) {
-                   return callback(err);
-               }
-               return callback();
-            });
+            let isLocalTransaction = false;
+            try {
+                if (this.transaction == null) {
+                    this.transaction = this.rawClient.startSession();
+                    this.transaction.startTransaction({ readConcern: { level: "snapshot" }, writeConcern: { w: "majority" } });
+                    isLocalTransaction = true;
+                }
+                transactionFunc.bind(this)( err => {
+                    if (err) {
+                        if (isLocalTransaction) {
+                            return this.transaction.abortTransaction().then(() => {
+                                // end transaction
+                                this.transaction.endSession();
+                                // set null
+                                this.transaction = null;
+                                return callback(err);
+                            }).catch( transactionError => {
+                                // end transaction
+                                this.transaction.endSession();
+                                // set null
+                                this.transaction = null;
+                                return callback(err);
+                            });
+                        }
+                        return callback(err);
+                    }
+                    if (isLocalTransaction) {
+                        return this.transaction.commitTransaction().then(() => {
+                            // end transaction
+                            this.transaction.endSession();
+                            // set null
+                            this.transaction = null;
+                            // and return
+                            return callback();
+                        }).catch( transactionError => {
+                            // end transaction
+                            this.transaction.endSession();
+                            // set null
+                            this.transaction = null;
+                            // and return
+                            return callback(transactionError);
+                        });
+                    }
+                    return callback();
+                });
+            }
+            catch (err) {
+                return callback(err);
+            }
+
         });
     }
 

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://themost.io/license
  */
 import {SqlFormatter} from '@themost/query';
+const debug = require('debug')('themost-framework:mongo');
 // noinspection JSUnusedGlobalSymbols
 /**
  * @class
@@ -72,45 +73,118 @@ export class MongoFormatter extends SqlFormatter {
         throw new TypeError('Expected an instance of QueryField');
     }
 
+    formatCount(query) {
+        return this.formatSelect(query).count();
+    }
+
     formatSelect(query) {
         const self = this;
-        const select = query.$select[this.getCollection().collectionName] || ['*'];
+        const collectionName = this.getCollection().collectionName;
+        const select = query.$select[collectionName] || ['*'];
         if (!Array.isArray(select)) {
             throw new Error('Invalid Argument. Select must be an array of attributes');
         }
-        const projection = {};
+        let projection;
         let aggregated = false;
         if (select.indexOf("*") < 0) {
+
+            projection = { };
+            const testCollection = new RegExp(collectionName + '.', 'g');
             select.forEach(function (x) {
                 const attr = self.format(x, '%f');
                 if (attr.aggregated) {
                     // set aggregated flag
                     aggregated = true;
                 }
+                let name;
+                for (let key in attr) {
+                    // if key starts with `[collection].`
+                    if (attr.hasOwnProperty(key)) {
+                        // get key
+                        name = key;
+                        break;
+                    }
+                }
+                // test attribute name
+                if (testCollection.test(name)) {
+                    Object.defineProperty(attr, name.replace(testCollection, ''), {
+                        configurable: true,
+                        enumerable: true,
+                        writable: true,
+                        value: 1
+                    });
+                    delete attr[name];
+                }
                 Object.assign(projection, attr);
             });
         }
+        // prepare group expression
+        let $count;
+        // if query has a count expression
+        if (typeof query.$count === 'string') {
+            // create group expression e.g. { $group: { _id: null, myCount: { $sum: 1 } } },
+            $count = {
+                $group: {
+                    _id: null
+                }
+            };
+            Object.defineProperty($count.$group, query.$count, {
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value: { $sum: 1 }
+            });
+            // set aggregation flag
+            aggregated = true;
+            // set projection if empty
+            projection = { _id: 0 };
+        }
+        let $match;
+        if (query.$where) {
+            $match = this.formatWhere(query.$where);
+        }
+        let finalSelect;
         if (aggregated) {
             const pipeline = [
                 {
                     "$project": projection
-                },
-                {
-                    "$match": this.formatWhere(query.$where)
                 }
             ];
+            if ($match) {
+                pipeline.push({
+                    "$match": $match
+                });
+            }
+            if ($count) {
+                pipeline.unshift($count);
+            }
             // check if query contains order expression
             if (query.$order) {
-                return this.getCollection().aggregate(pipeline).sort(this.formatOrder(query.$order));
+                // get order
+                const sort = this.formatOrder(query.$order);
+                // and return sorted data
+                debug('info', 'aggregate', `db.${this.getCollection().collectionName}.aggregate(${JSON.stringify(pipeline)}).sort(${sort})`);
+                finalSelect = this.getCollection().aggregate(pipeline).sort(sort);
             }
-            // otherwise return data
-            return this.getCollection().aggregate(pipeline);
+            else {
+                // otherwise return data without order
+                debug('info', 'aggregate', `db.${this.getCollection().collectionName}.aggregate(${JSON.stringify(pipeline)})`);
+                finalSelect = this.getCollection().aggregate(pipeline);
+            }
+
         } else {
+            const find = this.formatWhere(query.$where);
             if (query.$order) {
-                return this.getCollection().find(this.formatWhere(query.$where)).project(projection).sort(this.formatOrder(query.$order));
+                const order = this.formatOrder(query.$order);
+                debug('info', 'find', `db.${this.getCollection().collectionName}.find(${JSON.stringify(find) || 'null'},${JSON.stringify(projection)}).sort(${JSON.stringify(order)})`);
+                finalSelect =  this.getCollection().find(find).project(projection).sort(order);
             }
-            return this.getCollection().find(this.formatWhere(query.$where)).project(projection);
+            else {
+                debug('info', 'find', `db.${this.getCollection().collectionName}.find(${JSON.stringify(find) || 'null'},${JSON.stringify(projection)})`);
+                finalSelect = this.getCollection().find(find).project(projection);
+            }
         }
+        return finalSelect;
     }
 
     formatInsert(query) {
