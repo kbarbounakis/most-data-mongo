@@ -14,14 +14,12 @@
             "value":"javascript:return this.newid();"
         },
         {
-            "name": "CustomerID",
-            "property": "Customer",
+            "name": "Customer",
             "type": "Customer",
             "nullable": false
         },
         {
-            "name": "EmployeeID",
-            "property": "Employee",
+            "name": "Employee",
             "type": "Employee",
             "nullable": false
         },
@@ -31,8 +29,7 @@
             "nullable": false
         },
         {
-            "name": "ShipperID",
-            "property": "Shipper",
+            "name": "Shipper",
             "type": "Shipper",
             "nullable": false
         }

@@ -20,14 +20,12 @@
             "size": 255
         },
         {
-            "name": "SupplierID",
-            "property": "Supplier",
+            "name": "Supplier",
             "type": "Supplier",
             "nullable": false
         },
         {
-            "name": "CategoryID",
-            "property": "Category",
+            "name": "Category",
             "type": "Category",
             "nullable": false
         },

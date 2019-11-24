@@ -1,6 +1,7 @@
 import {DataConfiguration, DataConfigurationStrategy, DefaultDataContext} from '@themost/data';
 import {promisify} from 'es6-promisify';
 import path from 'path';
+import {MongoFormatter} from "./MongoFormatter";
 const debug = require('debug')('themost-framework:mongo');
 describe('MongoFormatter', () => {
     /**
@@ -54,7 +55,24 @@ describe('MongoFormatter', () => {
         expect(items.length).toBeTruthy();
     });
     it('should use MongoFormatter.formatWhere()',async () => {
-        // let item = await context.model('Categories').where('CategoryID').equal(1).silent().getItem();
-        // expect(item).toBeTruthy();
+        let item = await context.model('Categories').where('CategoryID').equal(1).silent().getItem();
+        expect(item).toBeTruthy();
+    });
+    it('should use DataQueryable.greaterThan()',async () => {
+        let items = await context.model('Categories').where('CategoryID').greaterThan(1).silent().getItems();
+        expect(items).toBeTruthy();
+    });
+    it('should use DataQueryable.getYear()',async () => {
+        const where = context.model('Employees').where('BirthDate').getYear().equal(1968).query.$where;
+        const formatter = new MongoFormatter({
+            collectionName: 'Employees'
+        });
+        let expr = formatter.formatWhere(where);
+        expect(expr).toEqual({
+            $eq: [
+                { $year: '$BirthDate' },
+                1968
+            ]
+        })
     });
 });

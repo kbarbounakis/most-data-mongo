@@ -6,10 +6,14 @@
  * found in the LICENSE file at https://themost.io/license
  */
 import {SqlFormatter} from "@themost/query";
-import {Collection} from "mongodb";
+
+export declare interface MongoCollection {
+    collectionName: string;
+}
+
 /**
  *
  */
 export declare class MongoFormatter extends SqlFormatter {
-    constructor(collection: Collection);
+    constructor(collection: MongoCollection);
 }

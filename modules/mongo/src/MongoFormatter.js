@@ -6,14 +6,37 @@
  * found in the LICENSE file at https://themost.io/license
  */
 import {SqlFormatter} from '@themost/query';
+import {Args} from '@themost/common';
 const debug = require('debug')('themost-framework:mongo');
+const REFERENCE_REGEXP = /^\$/;
+
+function getOwnPropertyName(any) {
+    if (any) {
+        // noinspection LoopStatementThatDoesntLoopJS
+        for(let key in any) {
+            if  (any.hasOwnProperty(key)) {
+                return key;
+            }
+        }
+    }
+}
+
+/**
+ * Returns true if the specified string is a method (e.g. $concat) or name reference (e.g. $dateCreated)
+ * @param {string} str
+ * @returns {*}
+ */
+export function isMethodOrNameReference(str) {
+    return REFERENCE_REGEXP.test(str)
+}
+
 // noinspection JSUnusedGlobalSymbols
 /**
  * @class
  */
 export class MongoFormatter extends SqlFormatter {
     /**
-     * @param {Collection=} collection
+     * @param {MongoCollection} collection
      */
     constructor(collection) {
         super();
@@ -21,7 +44,7 @@ export class MongoFormatter extends SqlFormatter {
             return collection;
         };
         this.settings = {
-            nameFormat: '\$$1'
+            nameFormat: '$$$1'
         }
     }
 
@@ -141,7 +164,9 @@ export class MongoFormatter extends SqlFormatter {
         }
         let $match;
         if (query.$where) {
-            $match = this.formatWhere(query.$where);
+            $match = {
+                $expr: this.formatWhere(query.$where)
+            };
         }
         let finalSelect;
         if (aggregated) {
@@ -173,15 +198,14 @@ export class MongoFormatter extends SqlFormatter {
             }
 
         } else {
-            const find = this.formatWhere(query.$where);
             if (query.$order) {
                 const order = this.formatOrder(query.$order);
-                debug('info', 'find', `db.${this.getCollection().collectionName}.find(${JSON.stringify(find) || 'null'},${JSON.stringify(projection)}).sort(${JSON.stringify(order)})`);
-                finalSelect =  this.getCollection().find(find).project(projection).sort(order);
+                debug('info', 'find', `db.${this.getCollection().collectionName}.find(${JSON.stringify($match) || 'null'},${JSON.stringify(projection)}).sort(${JSON.stringify(order)})`);
+                finalSelect =  this.getCollection().find($match).project(projection).sort(order);
             }
             else {
-                debug('info', 'find', `db.${this.getCollection().collectionName}.find(${JSON.stringify(find) || 'null'},${JSON.stringify(projection)})`);
-                finalSelect = this.getCollection().find(find).project(projection);
+                debug('info', 'find', `db.${this.getCollection().collectionName}.find(${JSON.stringify($match) || 'null'},${JSON.stringify(projection)})`);
+                finalSelect = this.getCollection().find($match).project(projection);
             }
         }
         return finalSelect;
@@ -211,8 +235,174 @@ export class MongoFormatter extends SqlFormatter {
         return remove;
     }
 
-    formatWhere(where) {
-        return where;
+    formatWhere(expr) {
+        if (expr == null) {
+            return;
+        }
+        const name = getOwnPropertyName(expr);
+        if (isMethodOrNameReference(name)) {
+            // get format method
+            const formatFunc = this[name];
+            if (typeof formatFunc === 'function') {
+                return formatFunc.apply(this, expr[name]);
+            }
+            throw new Error('Invalid expression or bad syntax');
+        }
+        else {
+            let args = [];
+            // get compare expression e.g. { "$eq" : "John" }
+            let comparerExpr = expr[name];
+            // call format where by assigning field as first argument
+            // e.g. { "$eq" : [ "$givenName",  "John" ] }
+            const comparerName = getOwnPropertyName(comparerExpr);
+            // add an exception here for simple equality expressions e.g. { "firstName": "John" }
+            if (isMethodOrNameReference(comparerName)  === false) {
+                // extract and return an equality expression
+                return {
+                    $eq: [
+                        this.escapeName(name),
+                        expr[name]
+                    ]
+                };
+            }
+            // get comparer arguments e.g. "John"
+            const comparerArgs = comparerExpr[comparerName];
+            if (Array.isArray(comparerArgs)) {
+                // copy arguments
+                args = comparerArgs.slice();
+                // insert item
+                args.unshift(`$${name}`);
+            }
+            else {
+                return this.formatWhere({
+                    $eq: [
+                        this.escapeName(name),
+                        comparerArgs
+                    ]
+                });
+            }
+            // create new comparer expression e.g. { "$eq": [ "$givenName", "John" ] }
+            comparerExpr = { };
+            comparerExpr[comparerName] = args;
+            // format expression
+            return this.formatWhere(comparerExpr);
+        }
+    }
+
+    $and() {
+        const conditions = Array.from(arguments);
+        Args.check(conditions.length, 'Expected at least one expression.');
+        return {
+            $and: conditions.map( condition => {
+                return this.formatWhere(condition);
+            })
+        };
+    }
+
+    $or() {
+        const conditions = Array.from(arguments);
+        Args.check(conditions.length, 'Expected at least one expression.');
+        return {
+            $or: conditions.map( condition => {
+                return this.formatWhere(condition);
+            })
+        };
+    }
+
+    $eq(left, right) {
+        if (Array.isArray(right)) {
+            return this.$in(left, right);
+        }
+        return {
+            $eq: [
+                this.escapeName(left),
+                this.escape(right)
+            ]
+        };
+    }
+
+    $gt(left, right) {
+        const res = {};
+        Object.defineProperty(res, this._escapeName(left, '$1'), {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value:  {
+                $gt: this.escape(right)
+            }
+        });
+        return res;
+    }
+
+    $gte(left, right) {
+        const res = {};
+        Object.defineProperty(res, this._escapeName(left, '$1'), {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value:  {
+                $gte: this.escape(right)
+            }
+        });
+        return res;
+    }
+
+    $lt(left, right) {
+        const res = {};
+        Object.defineProperty(res, this._escapeName(left, '$1'), {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value:  {
+                $lt: this.escape(right)
+            }
+        });
+        return res;
+    }
+
+    $lte(left, right) {
+        const res = {};
+        Object.defineProperty(res, this._escapeName(left, '$1'), {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value:  {
+                $lte: this.escape(right)
+            }
+        });
+        return res;
+    }
+
+    $in(left, right) {
+        Args.check(Array.isArray(right), new Error('The right operand of an IN statement must be an array.'));
+        const res = {};
+        Object.defineProperty(res, this._escapeName(left, '$1'), {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value:  {
+                $in: right.map( x => {
+                    return this.escape(x);
+                })
+            }
+        });
+        return res;
+    }
+
+    $nin(left, right) {
+        Args.check(Array.isArray(right), new Error('The right operand of a NOT IN statement must be an array.'));
+        const res = {};
+        Object.defineProperty(res, this._escapeName(left, '$1'), {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value:  {
+                $nin: right.map( x => {
+                    return this.escape(x);
+                })
+            }
+        });
+        return res;
     }
 
     // noinspection JSCheckFunctionSignatures
@@ -248,13 +438,41 @@ export class MongoFormatter extends SqlFormatter {
         return cursor.skip(skip).limit(take);
     }
 
-    escapeName(name) {
-        if (typeof name === 'string')
-            return name.replace(/(\w+)$|^(\w+)$/g, this.settings.nameFormat);
-        if (typeof name === 'object' && name.hasOwnProperty('$name')) {
-            return '$'.concat(name['$name']);
+    _escapeName(expr, nameFormat) {
+        const testCollection = new RegExp(this.getCollection().collectionName + '.', 'g');
+        if (typeof expr === 'string') {
+            return expr.replace(testCollection, '').replace(/\$?(\w+)|^\$?(\w+)$/g, nameFormat);
         }
-        return name;
+        if (typeof expr === 'object' && expr.hasOwnProperty('$name')) {
+            return expr.$name.replace(testCollection, '').replace(/\$?(\w+)|^\$?(\w+)$/g, nameFormat);
+        }
+        return expr;
+    }
+
+    /**
+     * @param value
+     * @param unquoted
+     */
+    escape(value, unquoted) {
+       if (value != null && typeof value === 'object') {
+           // if value is name reference
+           if (value.hasOwnProperty('$name')) {
+               return this.escapeName(value.$name);
+           }
+           const name = getOwnPropertyName(value);
+           if (isMethodOrNameReference(name)) {
+               // get format method
+               const formatFunc = this[name];
+               if (typeof formatFunc === 'function') {
+                   return formatFunc.apply(this, value[name]);
+               }
+           }
+       }
+       return value;
+    }
+
+    escapeName(expr) {
+        return this._escapeName(expr, this.settings.nameFormat);
     }
 
     // MongoAdapter extensions
