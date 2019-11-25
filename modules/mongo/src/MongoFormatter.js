@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://themost.io/license
  */
 import {SqlFormatter} from '@themost/query';
-import {Args} from '@themost/common';
+import {Args, LangUtils} from '@themost/common';
 const debug = require('debug')('themost-framework:mongo');
 const REFERENCE_REGEXP = /^\$/;
 
@@ -216,6 +216,17 @@ export class MongoFormatter extends SqlFormatter {
         if (insert == null) {
             throw new Error('Invalid Argument. Expected object or array');
         }
+        let value;
+        // format insert values
+        for (let key in insert) {
+            if (insert.hasOwnProperty(key) && typeof insert[key] === 'string') {
+                value = insert[key];
+                if (LangUtils.isDate(value)) {
+                    // update value
+                    insert[key] = new Date(value);
+                }
+            }
+        }
         return insert;
     }
 
@@ -223,6 +234,17 @@ export class MongoFormatter extends SqlFormatter {
         const update = query.$update[this.getCollection().collectionName];
         if (update == null) {
             throw new Error('Invalid Argument. Expected object or array');
+        }
+        let value;
+        // format update values
+        for (let key in update) {
+            if (update.hasOwnProperty(key) && typeof update[key] === 'string') {
+                value = update[key];
+                if (LangUtils.isDate(value)) {
+                    // update value
+                    update[key] = new Date(value);
+                }
+            }
         }
         return update;
     }
@@ -235,6 +257,15 @@ export class MongoFormatter extends SqlFormatter {
         return remove;
     }
 
+    isComparison(obj) {
+        for(let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                return (/^\$(eq|ne|lt|lte|gt|gte|in|nin)$/g.test(key));
+            }
+        }
+        return false;
+    }
+
     formatWhere(expr) {
         if (expr == null) {
             return;
@@ -244,7 +275,10 @@ export class MongoFormatter extends SqlFormatter {
             // get format method
             const formatFunc = this[name];
             if (typeof formatFunc === 'function') {
-                return formatFunc.apply(this, expr[name]);
+                if (Array.isArray(expr[name])) {
+                    return formatFunc.apply(this, expr[name]);
+                }
+                return formatFunc.call(this, expr[name]);
             }
             throw new Error('Invalid expression or bad syntax');
         }
@@ -254,19 +288,19 @@ export class MongoFormatter extends SqlFormatter {
             let comparerExpr = expr[name];
             // call format where by assigning field as first argument
             // e.g. { "$eq" : [ "$givenName",  "John" ] }
-            const comparerName = getOwnPropertyName(comparerExpr);
+            let comparerName = getOwnPropertyName(comparerExpr);
             // add an exception here for simple equality expressions e.g. { "firstName": "John" }
             if (isMethodOrNameReference(comparerName)  === false) {
                 // extract and return an equality expression
-                return {
+                return this.formatWhere({
                     $eq: [
                         this.escapeName(name),
                         expr[name]
                     ]
-                };
+                });
             }
             // get comparer arguments e.g. "John"
-            const comparerArgs = comparerExpr[comparerName];
+            let comparerArgs = comparerExpr[comparerName];
             if (Array.isArray(comparerArgs)) {
                 // copy arguments
                 args = comparerArgs.slice();
@@ -274,18 +308,62 @@ export class MongoFormatter extends SqlFormatter {
                 args.unshift(`$${name}`);
             }
             else {
-                return this.formatWhere({
-                    $eq: [
-                        this.escapeName(name),
-                        comparerArgs
-                    ]
-                });
+                // if expression is a comparison expression like $eq or $gt etc
+                if (this.isComparison(comparerExpr)) {
+                    args.push(this.escapeName(name));
+                    args.push(comparerArgs)
+                }
+                else {
+                    // push arguments e.g. { $year: "$BirthDate" }
+                    let comparerFunc = { };
+                    Object.defineProperty(comparerFunc, comparerName, {
+                        configurable: true,
+                        enumerable: true,
+                        writable: true,
+                        value: this.escapeName(name)
+                    });
+                    args.push(comparerFunc);
+                    // analyze compare arguments
+                    // if compare arguments is an object e.g. { $gt: 1990 }
+                    if (typeof comparerArgs === 'object') {
+                        // get comparer name
+                        comparerName = getOwnPropertyName(comparerArgs);
+                        // if comparer is a method reference e.g. $gt
+                        if (isMethodOrNameReference(comparerName)) {
+                            // get real arguments e.g. 1990 or ['test', 4]
+                            comparerArgs = comparerArgs[comparerName];
+                            // and push to final arguments
+                            if (Array.isArray(comparerArgs)) {
+                                args.push.apply(args, comparerArgs);
+                            }
+                            else {
+                                args.push(comparerArgs);
+                            }
+                            //
+                            const comparerFuncFinal = { };
+                            Object.defineProperty(comparerFuncFinal, comparerName, {
+                                configurable: true,
+                                enumerable: true,
+                                writable: true,
+                                value: args
+                            });
+                            // e.g. { $gt: [ { $year: '$BirthDate'}, 1990 ] }
+                            return this.formatWhere(comparerFuncFinal);
+                        }
+                    }
+                    // otherwise push arguments
+                    args.push(comparerArgs);
+                    // and execute
+                    return this.formatWhere({
+                        $eq: args
+                    });
+                }
             }
             // create new comparer expression e.g. { "$eq": [ "$givenName", "John" ] }
-            comparerExpr = { };
-            comparerExpr[comparerName] = args;
-            // format expression
-            return this.formatWhere(comparerExpr);
+            const formatFunc = this[comparerName];
+            if (typeof formatFunc === 'function') {
+                return formatFunc.apply(this, args);
+            }
         }
     }
 
@@ -315,94 +393,70 @@ export class MongoFormatter extends SqlFormatter {
         }
         return {
             $eq: [
-                this.escapeName(left),
+                this.escape(left),
                 this.escape(right)
             ]
         };
     }
 
     $gt(left, right) {
-        const res = {};
-        Object.defineProperty(res, this._escapeName(left, '$1'), {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value:  {
-                $gt: this.escape(right)
-            }
-        });
-        return res;
+        return {
+            $gt: [
+                this.escape(left),
+                this.escape(right)
+            ]
+        };
     }
 
     $gte(left, right) {
-        const res = {};
-        Object.defineProperty(res, this._escapeName(left, '$1'), {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value:  {
-                $gte: this.escape(right)
-            }
-        });
-        return res;
+        return {
+            $gte: [
+                this.escape(left),
+                this.escape(right)
+            ]
+        };
     }
 
     $lt(left, right) {
-        const res = {};
-        Object.defineProperty(res, this._escapeName(left, '$1'), {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value:  {
-                $lt: this.escape(right)
-            }
-        });
-        return res;
+        return {
+            $lt: [
+                this.escape(left),
+                this.escape(right)
+            ]
+        };
     }
 
     $lte(left, right) {
-        const res = {};
-        Object.defineProperty(res, this._escapeName(left, '$1'), {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value:  {
-                $lte: this.escape(right)
-            }
-        });
-        return res;
+        return {
+            $lte: [
+                this.escape(left),
+                this.escape(right)
+            ]
+        };
     }
 
     $in(left, right) {
         Args.check(Array.isArray(right), new Error('The right operand of an IN statement must be an array.'));
-        const res = {};
-        Object.defineProperty(res, this._escapeName(left, '$1'), {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value:  {
-                $in: right.map( x => {
+        return {
+            $in: [
+                this.escape(left),
+                right.map( x => {
                     return this.escape(x);
                 })
-            }
-        });
-        return res;
+            ]
+        };
     }
 
     $nin(left, right) {
         Args.check(Array.isArray(right), new Error('The right operand of a NOT IN statement must be an array.'));
-        const res = {};
-        Object.defineProperty(res, this._escapeName(left, '$1'), {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value:  {
-                $nin: right.map( x => {
+        return {
+            $nin: [
+                this.escape(left),
+                right.map( x => {
                     return this.escape(x);
                 })
-            }
-        });
-        return res;
+            ]
+        };
     }
 
     // noinspection JSCheckFunctionSignatures
@@ -464,7 +518,13 @@ export class MongoFormatter extends SqlFormatter {
                // get format method
                const formatFunc = this[name];
                if (typeof formatFunc === 'function') {
-                   return formatFunc.apply(this, value[name]);
+                   const arg = value[name];
+                   if (Array.isArray(arg)) {
+                       return formatFunc.apply(this, arg);
+                   }
+                   else {
+                       return formatFunc.call(this, arg);
+                   }
                }
            }
        }
@@ -482,7 +542,10 @@ export class MongoFormatter extends SqlFormatter {
      */
     $year(p0) {
         return {
-            $year: this.escapeName(p0)
+            $year: {
+                date: this.escape(p0),
+                timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+            }
         };
     }
 
@@ -492,7 +555,10 @@ export class MongoFormatter extends SqlFormatter {
      */
     $month(p0) {
         return {
-            $month: this.escapeName(p0)
+            $month: {
+                date: this.escape(p0),
+                timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+            }
         };
     }
 
@@ -502,7 +568,24 @@ export class MongoFormatter extends SqlFormatter {
      */
     $day(p0) {
         return {
-            $dayOfMonth: this.escapeName(p0)
+            $dayOfMonth: {
+                date: this.escape(p0),
+                timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+            }
+        };
+    }
+
+    /**
+     * @param p0
+     * @returns *
+     */
+    $dayOfMonth(p0) {
+        // get timezone
+        return {
+            $dayOfMonth: {
+                date: this.escape(p0),
+                timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+            }
         };
     }
 
@@ -512,7 +595,10 @@ export class MongoFormatter extends SqlFormatter {
      */
     $hour(p0) {
         return {
-            $hour: this.escapeName(p0)
+            $hour: {
+                date: this.escape(p0),
+                timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+            }
         };
     }
 
@@ -522,7 +608,10 @@ export class MongoFormatter extends SqlFormatter {
      */
     $minute(p0) {
         return {
-            $minute: this.escapeName(p0)
+            $minute: {
+                date: this.escape(p0),
+                timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+            }
         };
     }
 
@@ -532,7 +621,10 @@ export class MongoFormatter extends SqlFormatter {
      */
     $second(p0) {
         return {
-            $second: this.escapeName(p0)
+            $second: {
+                date: this.escape(p0),
+                timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+            }
         };
     }
 
@@ -542,7 +634,7 @@ export class MongoFormatter extends SqlFormatter {
      */
     $floor(p0) {
         return {
-            $floor: this.escapeName(p0)
+            $floor: this.escape(p0)
         };
     }
 
@@ -552,7 +644,7 @@ export class MongoFormatter extends SqlFormatter {
      */
     $ceiling(p0) {
         return {
-            $ceil: this.escapeName(p0)
+            $ceil: this.escape(p0)
         };
     }
 
@@ -562,7 +654,7 @@ export class MongoFormatter extends SqlFormatter {
      */
     $tolower(p0) {
         return {
-            $toLower: this.escapeName(p0)
+            $toLower: this.escape(p0)
         };
     }
 
@@ -572,7 +664,7 @@ export class MongoFormatter extends SqlFormatter {
      */
     $toupper(p0) {
         return {
-            $toUpper: this.escapeName(p0)
+            $toUpper: this.escape(p0)
         };
     }
 
@@ -582,7 +674,7 @@ export class MongoFormatter extends SqlFormatter {
      */
     $length(p0) {
         return {
-            $length: this.escapeName(p0)
+            $length: this.escape(p0)
         };
     }
 

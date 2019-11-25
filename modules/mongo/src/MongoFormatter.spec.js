@@ -58,21 +58,140 @@ describe('MongoFormatter', () => {
         let item = await context.model('Categories').where('CategoryID').equal(1).silent().getItem();
         expect(item).toBeTruthy();
     });
-    it('should use DataQueryable.greaterThan()',async () => {
-        let items = await context.model('Categories').where('CategoryID').greaterThan(1).silent().getItems();
-        expect(items).toBeTruthy();
-    });
-    it('should use DataQueryable.getYear()',async () => {
-        const where = context.model('Employees').where('BirthDate').getYear().equal(1968).query.$where;
+    it('should use DataQueryable.equal()',async () => {
+        const query = await context.model('Categories').where('CategoryID').equal(1).query;
         const formatter = new MongoFormatter({
-            collectionName: 'Employees'
+            collectionName: 'Categories'
         });
-        let expr = formatter.formatWhere(where);
+        let expr = formatter.formatWhere(query.$where);
         expect(expr).toEqual({
             $eq: [
-                { $year: '$BirthDate' },
+                '$CategoryID',
+                1
+            ]
+        });
+    });
+    it('should use DataQueryable.greaterThan()',async () => {
+        const query = await context.model('Categories').where('CategoryID').greaterThan(1).query;
+        const formatter = new MongoFormatter({
+            collectionName: 'Categories'
+        });
+        let expr = formatter.formatWhere(query.$where);
+        expect(expr).toEqual({
+            $gt: [
+                '$CategoryID',
+                1
+            ]
+        });
+    });
+    it('should use DataQueryable.getYear()',async () => {
+        let query = context.model('Employees').where('BirthDate').getYear().equal(1968).query;
+        let formatter = new MongoFormatter({
+            collectionName: 'Employees'
+        });
+        let expr = formatter.formatWhere(query.$where);
+        expect(expr).toEqual({
+            $eq: [
+                {
+                    $year:{
+                        date: '$BirthDate',
+                        timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+                    }
+                },
                 1968
             ]
-        })
+        });
+
+        let items = await context.model('Employees').where('BirthDate').getYear().equal(1968)
+            .silent().getItems();
+        expect(items).toBeTruthy();
+        expect(items.filter( x => {
+            // noinspection JSUnresolvedVariable
+            return x.BirthDate.getFullYear() !== 1968;
+        }).length).toEqual(0);
+
+    });
+
+    it('should use DataQueryable.getYear().greaterThan()',async () => {
+
+        let query = context.model('Employees').where('BirthDate').getYear().greaterThan(1968).query;
+        let formatter = new MongoFormatter({
+            collectionName: 'Employees'
+        });
+        let expr = formatter.formatWhere(query.$where);
+        expect(expr).toEqual({
+            $gt: [
+                {
+                    $year: {
+                        date: '$BirthDate',
+                        timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+                    }
+                },
+                1968
+            ]
+        });
+
+        let items = await context.model('Employees').where('BirthDate').getYear().greaterThan(1968)
+            .silent().getItems();
+        expect(items).toBeTruthy();
+        expect(items.filter( x => {
+            // noinspection JSUnresolvedVariable
+            return x.BirthDate.getFullYear() <= 1968;
+        }).length).toEqual(0);
+
+    });
+
+    it('should use DataQueryable.getMonth()',async () => {
+        let query = context.model('Employees').where('BirthDate').getMonth().equal(12).query;
+        let formatter = new MongoFormatter({
+            collectionName: 'Employees'
+        });
+        let expr = formatter.formatWhere(query.$where);
+        expect(expr).toEqual({
+            $eq: [
+                {
+                    $month: {
+                        date: '$BirthDate',
+                        timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+                    }
+                },
+                12
+            ]
+        });
+
+        let items = await context.model('Employees').where('BirthDate').getMonth().equal(12)
+            .silent().getItems();
+        expect(items).toBeTruthy();
+        items.forEach( x => {
+           // noinspection JSUnresolvedVariable
+            expect(x.BirthDate.getMonth()).toEqual(11);
+        });
+    });
+
+    it('should use DataQueryable.getDay()',async () => {
+        let query = context.model('Employees').where('BirthDate').getDay().equal(8).query;
+        let formatter = new MongoFormatter({
+            collectionName: 'Employees'
+        });
+        let expr = formatter.formatWhere(query.$where);
+        expect(expr).toEqual({
+            $eq: [
+                {
+                    $dayOfMonth: {
+                        date: '$BirthDate',
+                        timezone: new Date().toTimeString().match(/(\+\d+)/)[0]
+                    }
+                },
+                8
+            ]
+        });
+
+        let items = await context.model('Employees').where('BirthDate').getDay().equal(8)
+            .silent().getItems();
+        expect(items).toBeTruthy();
+        items.forEach( x=> {
+            // noinspection JSUnresolvedVariable
+            expect(x.BirthDate.getDate()).toEqual(8);
+        });
     });
 });
