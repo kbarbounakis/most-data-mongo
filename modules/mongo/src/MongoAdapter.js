@@ -256,19 +256,19 @@ export class MongoAdapter {
         if (options == null) {
             throw new Error('Connection options may not be null.');
         }
-        let connectionURL_ = 'mongodb://';
+        let _connectionURL = 'mongodb://';
         if (options.user && options.user.length) {
-            connectionURL_ += options.user;
-            connectionURL_ += ':' + (options.password || '') + '@';
+            _connectionURL += options.user;
+            _connectionURL += ':' + (options.password || '') + '@';
         }
-        connectionURL_ += options.host || '127.0.0.1';
-        connectionURL_ += ':' + (options.port || 27017);
+        _connectionURL += options.host || '127.0.0.1';
+        _connectionURL += ':' + (options.port || 27017);
 
         if (options.database == null) {
             throw new Error('Connection database may not be null.');
         }
         // finalize connection url
-        connectionURL_ += '/' + (options.authenticationDatabase ? options.authenticationDatabase : options.database);
+        _connectionURL += '/' + (options.authenticationDatabase ? options.authenticationDatabase : options.database);
 
         options.options = options.options || {};
         Object.assign(options.options, {
@@ -282,7 +282,7 @@ export class MongoAdapter {
         });
 
         Object.defineProperty(this, 'connectionURL', {
-            value: connectionURL_,
+            value: _connectionURL,
             configurable: false,
             enumerable: false
         });

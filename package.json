@@ -1,6 +1,6 @@
 {
   "name": "most-data-mongo",
-  "version": "2.1.0",
+  "version": "2.0.0",
   "description": "MOST Web Framework MongoDB Data Adapter Project",
   "private": true,
   "scripts": {
@@ -57,9 +57,11 @@
     "@types/sql.js": "^1.0.2",
     "core-js": "^2.6.10",
     "debug": "^4.1.1",
+    "dotenv": "^8.2.0",
     "es6-promisify": "^6.0.2",
     "jasmine": "^3.5.0",
     "jasmine-spec-reporter": "^4.2.1",
+    "module-alias": "^2.2.2",
     "mongodb": "^3.2.7",
     "rollup": "^1.27.0",
     "rollup-plugin-auto-external": "^2.0.0",
@@ -69,5 +71,8 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "sql.js": "^1.0.1",
     "typescript": "^3.7.2"
+  },
+  "_moduleAliases": {
+    "@themost/mongo": "modules/mongo/src"
   }
 }

@@ -1,8 +1,10 @@
 import {DataConfiguration, DataConfigurationStrategy, DefaultDataContext} from '@themost/data';
 import {promisify} from 'es6-promisify';
 import path from 'path';
-import {MongoFormatter} from "./MongoFormatter";
+import {MongoFormatter} from '@themost/mongo';
 const debug = require('debug')('themost-framework:mongo');
+import {testConnectionOptionsFromEnv} from "./testUtils";
+const testConnectionOptions = testConnectionOptionsFromEnv();
 describe('MongoFormatter', () => {
     /**
      * @type {DataConfiguration}
@@ -13,7 +15,7 @@ describe('MongoFormatter', () => {
      */
     let context;
     beforeAll(() => {
-        configuration = new DataConfiguration(path.resolve(__dirname, 'test/config'));
+        configuration = new DataConfiguration(path.resolve(__dirname, 'config'));
         configuration.setSourceAt('adapterTypes', [
             {
                 "name": "MongoDB Data Adapter",
@@ -26,11 +28,7 @@ describe('MongoFormatter', () => {
                 "name": "mongo-db",
                 "invariantName": "mongo",
                 "default": true,
-                "options": {
-                    "host":"localhost",
-                    "port":27017,
-                    "database":"test"
-                }
+                "options": testConnectionOptions
             }
         ]);
         // reset data configuration strategy
@@ -40,6 +38,7 @@ describe('MongoFormatter', () => {
     });
     beforeEach(() => {
         // create context
+        // noinspection JSValidateTypes
         context = new DefaultDataContext();
     });
     afterEach(async () => {

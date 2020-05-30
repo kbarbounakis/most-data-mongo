@@ -1,8 +1,9 @@
 {
   "name": "@themost/mongo",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "MOST Web Framework MongoDB Data Adapter",
   "main": "dist/themost_mongo.js",
+  "types": "dist/themost_mongo.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/kbarbounakis/most-data-mongo.git"

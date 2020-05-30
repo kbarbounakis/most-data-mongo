@@ -5,55 +5,35 @@
  * Use of this source code is governed by an BSD-3-Clause license that can be
  * found in the LICENSE file at https://themost.io/license
  */
-import {MongoAdapter} from "./MongoAdapter";
+import {MongoAdapter} from '@themost/mongo';
 import {QueryExpression} from '@themost/query';
+import {testConnectionOptionsFromEnv} from "./testUtils";
+const testConnectionOptions = testConnectionOptionsFromEnv();
 
-describe('MemoryAdapter', ()=> {
+describe('MongoAdapter', ()=> {
     it('should create instance', () => {
-        const adapter = new MongoAdapter({
-            "host":"localhost",
-            "port":27017,
-            "database":"test"
-        });
+        const adapter = new MongoAdapter(testConnectionOptions);
         expect(adapter).toBeTruthy();
     });
-    it('should use MemoryAdapter.open()', async () => {
-        let adapter = new MongoAdapter({
-            "host":"localhost",
-            "port":27017,
-            "database":"test"
-        });
+    it('should use MongoAdapter.open()', async () => {
+        let adapter = new MongoAdapter(testConnectionOptions);
         await adapter.openAsync();
         expect(adapter.rawConnection).toBeTruthy();
-        let failedAdapter = new MongoAdapter({
-            "host":"localhost",
-            "port":27018,
-            "database":"test"
+        const failedConnectionOptions = Object.assign({}, testConnectionOptions, {
+            host: 'unknown'
         });
-        await expectAsync(failedAdapter.openAsync()).toBeRejected();
-        failedAdapter = new MongoAdapter({
-            "host":"unknown",
-            "database":"test"
-        });
+        let failedAdapter = new MongoAdapter(failedConnectionOptions);
         await expectAsync(failedAdapter.openAsync()).toBeRejected();
     });
-    it('should use MemoryAdapter.close()', async () => {
-        const adapter = new MongoAdapter({
-            "host":"localhost",
-            "port":27017,
-            "database":"test"
-        });
+    it('should use MongoAdapter.close()', async () => {
+        const adapter = new MongoAdapter(testConnectionOptions);
         await expectAsync(adapter.openAsync()).toBeResolved();
         await expectAsync(adapter.closeAsync()).toBeResolved();
         expect(adapter.rawConnection).toBeFalsy();
     });
 
-    it('should use MemoryAdapter.execute()', async () => {
-        const adapter = new MongoAdapter({
-            "host":"localhost",
-            "port":27017,
-            "database":"test"
-        });
+    it('should use MongoAdapter.execute()', async () => {
+        const adapter = new MongoAdapter(testConnectionOptions);
         // insert
         let query = new QueryExpression()
             .insert({
@@ -85,12 +65,8 @@ describe('MemoryAdapter', ()=> {
         expect(items.length).toEqual(0);
     });
 
-    it('should use MemoryAdapter.executeInTransaction()', async () => {
-        const adapter = new MongoAdapter({
-            "host":"localhost",
-            "port":27017,
-            "database":"test"
-        });
+    it('should use MongoAdapter.executeInTransaction()', async () => {
+        const adapter = new MongoAdapter(testConnectionOptions);
         let lastIdentity;
         await adapter.executeInTransactionAsync(async () => {
             let query = new QueryExpression()
@@ -126,11 +102,7 @@ describe('MemoryAdapter', ()=> {
     });
 
     it('should use MongoAdapter.selectIdentity()', async () => {
-        const adapter = new MongoAdapter({
-            "host":"localhost",
-            "port":27017,
-            "database":"test"
-        });
+        const adapter = new MongoAdapter(testConnectionOptions);
         let newIdentity = await adapter.selectIdentityAsync('Customers', 'CustomerID');
         expect(newIdentity).toBeTruthy();
         let anotherIdentity = await adapter.selectIdentityAsync('Customers', 'CustomerID');
