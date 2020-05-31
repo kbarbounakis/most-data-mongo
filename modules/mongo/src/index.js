@@ -8,3 +8,7 @@
 
 export * from './MongoAdapter';
 export * from './MongoFormatter';
+export * from './MongoDataModel';
+export * from './listeners/MongoDataNoopListener';
+export * from './listeners/MongoDataNestedObjectListener';
+export * from './listeners/MongoDataObjectAssociationListener';

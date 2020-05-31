@@ -165,9 +165,9 @@ function executeUpdate(query) {
                     if (self.transaction) {
                         // assign session
                     }
-                    debug('info', `db.${collection.collectionName}.updateMany(${JSON.stringify(filter)}, ${JSON.stringify(update)})`);
+                    debug('info', `db.${collection.collectionName}.updateMany(${JSON.stringify({ $expr: filter })}, ${JSON.stringify(update)})`);
                     // noinspection JSUnresolvedFunction
-                    return collection.updateMany(filter, update, updateOptions, function (err, result) {
+                    return collection.updateMany({ $expr: filter }, update, updateOptions, function (err, result) {
                         if (err) {
                             return reject(err);
                         }

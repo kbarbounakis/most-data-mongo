@@ -24,27 +24,11 @@ fdescribe('Data Associations', () => {
         }
     });
     it('should use MongoDataObjectAssociationListener.beforeSave()',async () => {
-        const products = context.model('Products');
-        /**
-         * @type {*}
-         */
-        const event = {
-            target: {
-                "ProductID": 3,
-                "ProductName": "Aniseed Syrup",
-                "Supplier": 1,
-                "Category": 2,
-                "Unit": "12 - 550 ml bottles",
-                "Price": 10.0
-            },
-            state: 1,
-            model: products
-        };
-        await MongoDataObjectAssociationListener.prototype.beforeSaveAsync(event);
-        expect(event).toBeTruthy();
-        expect(event.target.Category).toBeTruthy();
-        expect(event.target.Category.$ref).toBe(context.model('Category').sourceAdapter);
-        expect(event.target.Supplier).toBeTruthy();
-        expect(event.target.Supplier.$ref).toBe(context.model('Supplier').sourceAdapter);
+        const product = await context.model('Products')
+            .where('ProductID')
+            .equal(2)
+            .getItem();
+        await context.model('Products').silent().save(product);
+        expect(product).toBeTruthy();
     });
 });

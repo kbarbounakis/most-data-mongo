@@ -1,5 +1,10 @@
-import {DataConfiguration, DataConfigurationStrategy} from "@themost/data";
+import {DataConfiguration, DataConfigurationStrategy, DefaultDataContext} from "@themost/data";
 import path from "path";
+import {DataObjectAssociationListener} from "@themost/data/data-associations";
+import {DataNestedObjectListener} from '@themost/data/data-nested-object-listener';
+import {DataValidatorListener} from '@themost/data/data-validator';
+import {DataPermissionEventListener} from '@themost/data/data-permission';
+import {MongoDataObjectAssociationListener, MongoDataNoopListener, MongoDataModel} from "../modules/mongo/src";
 
 export function testConnectionOptionsFromEnv() {
     const connectionOptions = {
@@ -42,4 +47,32 @@ export function setTestConfiguration() {
     configuration.useStrategy(DataConfigurationStrategy, DataConfigurationStrategy);
     // set current configuration
     DataConfiguration.setCurrent(configuration);
+    Object.assign(DefaultDataContext.prototype, {
+        model: function(name) {
+            const definition = this.getConfiguration().getStrategy(DataConfigurationStrategy).model(name);
+            if (definition == null) {
+                return null;
+            }
+            const res = new MongoDataModel(definition);
+            res.context = this;
+            return res;
+        }
+    });
+    // override listeners
+    Object.assign(DataObjectAssociationListener.prototype, {
+        beforeSave: MongoDataObjectAssociationListener.prototype.beforeSave,
+        afterSave: MongoDataObjectAssociationListener.prototype.afterSave
+    });
+    Object.assign(DataValidatorListener.prototype, {
+        beforeSave: MongoDataNoopListener.prototype.beforeSave
+    });
+    Object.assign(DataNestedObjectListener.prototype, {
+        beforeSave: MongoDataNoopListener.prototype.beforeSave,
+        afterSave: MongoDataNoopListener.prototype.afterSave
+    });
+    Object.assign(DataPermissionEventListener.prototype, {
+        beforeSave: MongoDataNoopListener.prototype.beforeSave,
+        beforeRemove: MongoDataNoopListener.prototype.afterSave,
+        beforeExecute: MongoDataNoopListener.prototype.beforeExecute
+    });
 }
