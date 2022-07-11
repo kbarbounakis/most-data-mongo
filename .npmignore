@@ -1,4 +1,15 @@
+# ide
 .idea
-node_modules
-.gitignore
+.vscode
+.theia
 .DS_Store
+
+# node
+node_modules
+
+# github
+.github
+
+# gitpod
+.gitpod.yml
+.gitpod.dockerfile
